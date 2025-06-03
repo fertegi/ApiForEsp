@@ -7,7 +7,7 @@ export async function fetchWeather(lat, lon) {
         throw new Error(`Fehler beim Abrufen der Wetterdaten: ${response.status}`);
     }
     const data = await response.json();
-    return data.current_weather;
+    return data.current;
 }
 
 // Bewertet, ob das Wetter angenehm zum Fahrradfahren ist
