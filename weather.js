@@ -1,7 +1,7 @@
 
 // Holt aktuelle Wetterdaten von Open-Meteo für eine bestimmte Koordinate
 export async function fetchWeather(lat, lon) {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,rain,showers,snowfall,weather_code,cloud_cover,wind_speed_10m,wind_direction_10m,wind_gusts_10m`;
     const response = await fetch(url);
     if (!response.ok) {
         throw new Error(`Fehler beim Abrufen der Wetterdaten: ${response.status}`);
