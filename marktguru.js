@@ -120,7 +120,12 @@ export function mapByRetailers(offers) {
             a.keyword.localeCompare(b.keyword)
         })
     }
-    return removeDuplicates(grouped);
+
+
+    const result = grouped.forEach((offers, retailer) => {
+        grouped[retailer] = removeDuplicates(offers);
+    });
+    return result;
 }
 
 function removeDuplicates(offers) {
