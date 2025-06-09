@@ -122,10 +122,10 @@ export function mapByRetailers(offers) {
     }
 
 
-    const result = grouped.forEach((offers, retailer) => {
-        grouped[retailer] = removeDuplicates(offers);
+    Object.keys(grouped).forEach(retailer => {
+        grouped[retailer] = removeDuplicates(grouped[retailer]);
     });
-    return result;
+    return grouped;
 }
 
 function removeDuplicates(offers) {
