@@ -120,5 +120,16 @@ export function mapByRetailers(offers) {
             a.keyword.localeCompare(b.keyword)
         })
     }
-    return grouped;
+    return removeDuplicates(grouped);
+}
+
+function removeDuplicates(offers) {
+    const uniqueOffers = {};
+    offers.forEach(offer => {
+        const key = offer.name;
+        if (!uniqueOffers[key] || offer.price < uniqueOffers[key].price) {
+            uniqueOffers[key] = offer;
+        }
+    });
+    return Object.values(uniqueOffers);
 }
