@@ -13,6 +13,7 @@ export async function fetchWeather(lat, lon) {
 // Bewertet, ob das Wetter angenehm zum Fahrradfahren ist
 export function isBikeWeather(weather) {
     if (!weather) return false;
+    // TODO passe die keys an!
     const temp = weather.temperature;
     const wind = weather.windspeed;
     const rain = weather.precipitation || 0;

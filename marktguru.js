@@ -104,3 +104,21 @@ export async function searchByConfig(config) {
     }
     return response;
 }
+
+export function mapByRetailers(offers) {
+    const grouped = {};
+    for (const offer of offers) {
+        const retailer = offer.retailer || 'Unbekannt';
+        if (!grouped[retailer]) {
+            grouped[retailer] = [];
+        }
+        grouped[retailer].push(offer);
+    }
+
+    for (const retailer in grouped) {
+        grouped[retailer].sort((a, b) => {
+            a.keyword.localeCompare(b.keyword)
+        })
+    }
+    return grouped;
+}

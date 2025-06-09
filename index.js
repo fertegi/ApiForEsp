@@ -2,7 +2,7 @@ import express from 'express';
 import { readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { searchByConfig } from './marktguru.js';
+import { mapByRetailers, searchByConfig } from './marktguru.js';
 import { getData as getAllDepartures } from './bvg.js';
 import { fetchWeather } from './weather.js';
 const __filename = fileURLToPath(import.meta.url);
@@ -57,13 +57,17 @@ app.get("/api/marktguru", async (req, res) => {
         const { searchKeywords: keyWords = [], retailers = [] } = options;
         const zipCode = (config.location && config.location.zipCode) || '60487';
 
-        const offersResults = await Promise.all(keyWords.map(async keyWord => {
+        let offersResults = await Promise.all(keyWords.map(async keyWord => {
             const offers = await searchByConfig({ keyWord, retailers, zipCode });
             console.log(`Ergebnisse für ${keyWord}:`, offers.length);
             return offers;
         }));
 
-        res.json(offersResults.flat());
+        offersResults = mapByRetailers(offersResults.flat());
+        console.log(`Anzahl der Angebote insgesamt: ${offersResults}`);
+
+
+        res.json(offersResults);
     } catch (error) {
         console.error('Fehler beim Abrufen der Ergebnisse:', error);
         res.status(500).json({ error: 'Fehler beim Abrufen der Ergebnisse.' });
