@@ -105,10 +105,14 @@ export async function searchByConfig(config) {
     return response;
 }
 
+
+
 export function mapByRetailers(offers) {
     const grouped = {};
     for (const offer of offers) {
-        const retailer = offer.retailer || 'Unbekannt';
+        // INFO we shorten the retailer name to avoid too long keys
+        // in general, we can split by space and take the first part as it is usually the most relevant
+        const retailer = offer.retailer.split(" ")[0] || 'Unbekannt';
         if (!grouped[retailer]) {
             grouped[retailer] = [];
         }
