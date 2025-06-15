@@ -1,8 +1,8 @@
 import { parseTime, deltaFromNow } from "./util_time.js";
-
+import { config } from "./config.js";
 
 export async function fetchDepartures(stopId, resultCount = 5) {
-    const baseUrl = `https://v6.bvg.transport.rest/stops/${stopId}/departures?results=${resultCount}`;
+    const baseUrl = config.bvgApiUrl(stopId, resultCount);
 
     if (!baseUrl) {
         console.log('Base URL not configured in config.json');
@@ -92,7 +92,7 @@ export function postprocessData(data) {
     });
 }
 
-export async function getData(stops) {
+export async function getAllDepartures(stops) {
     const data = [];
     const locs = stops || [];
     if (!locs.length) {
@@ -104,7 +104,7 @@ export async function getData(stops) {
         const userLines = loc.lines || [];
         const stopId = loc.id;
         if (!stopId) {
-            console.log(`Stop ID missing for location: ${JSON.stringify(loc)} `);
+            console.log(`StopID missing for location: ${JSON.stringify(loc)} `);
             continue;
         }
         console.log(`Fetching departures for stop ID: ${stopId} with user lines: ${JSON.stringify(userLines)} `);

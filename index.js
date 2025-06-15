@@ -3,7 +3,7 @@ import { readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { mapByRetailers, searchByConfig } from './marktguru.js';
-import { getData as getAllDepartures } from './bvg.js';
+import { getAllDepartures } from './bvg.js';
 import { fetchWeather } from './weather.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

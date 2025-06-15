@@ -1,9 +1,10 @@
+import { config } from "./config.js";
 const re = /<script\stype="application\/json">([\s\S]*?)<\/script>/g;
 
 
 async function getKeys() {
     try {
-        const resp = await fetch('http://marktguru.de');
+        const resp = await fetch(config.marktGuruBaseUrl);
         const text = await resp.text();
         const matches = [...text.matchAll(re)];
         const configStr = matches.length ? matches[matches.length - 1][1] : '';
@@ -31,7 +32,7 @@ async function getClient() {
         'x-apikey': keys.apiKey,
         'x-clientkey': keys.clientKey
     };
-    const baseUrl = 'https://api.marktguru.de/api/v1';
+    const baseUrl = config.marktGuruApiUrl;
     // Gibt ein Objekt zurück, das für API-Requests genutzt werden kann
     return {
         baseUrl,
@@ -52,7 +53,7 @@ async function search(query = '', options = {}) {
         q: query,
         ...opts
     });
-    const url = `${client.baseUrl}/offers/search/?${params.toString()}`;
+    const url = config.marktGuruSearchUrl(params.toString());;
     const response = await fetch(url, {
         method: 'GET',
         headers: client.headers,
@@ -83,10 +84,11 @@ export async function searchByConfig(config) {
         allowedRetailers: retailers.length > 0 ? retailers : undefined
     };
     const results = await search(query, options);
+    console.log("raw result ", results)
     const response = [];
     const seenKeys = new Set();
     for (const result of results) {
-        const name = result.brand?.name || 'Unbekannt';
+        const name = `${result.product?.name} - ${result.brand?.name}` || 'Unbekannt';
         const price = result.price || 0.0;
         const retailer = result.advertisers?.[0]?.name || 'Unbekannt';
         const description = result.description || '';
