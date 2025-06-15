@@ -19,7 +19,7 @@ export async function fetchWeather(lat, lon) {
     const temperatures = hourlyData.temperature_2m || [];
     const windDirections = hourlyData.wind_direction_10m || [];
     const windSpeeds = hourlyData.wind_speed_10m || [];
-    const weatherCodes = hourlyData.weather_code || [];
+    const weatherCode = hourlyData.weather_code || [];
     const precipitation = hourlyData.precipitation || [];
     const precipitationProbability = hourlyData.precipitation_probability || [];
     const humidity = hourlyData.relative_humidity_2m || [];
@@ -30,11 +30,11 @@ export async function fetchWeather(lat, lon) {
         const hour = new Date(time).getHours();
         if (hoursToForecast.includes(hour)) {
             return {
-                time: time,
+                time: hour,
                 temperature: temperatures[index],
                 windDirection: windDirections[index],
                 windSpeed: windSpeeds[index],
-                weatherCode: weatherCodes[index],
+                weatherCode: weatherCode[index],
                 precipitation: precipitation[index],
                 precipitationProbability: precipitationProbability[index],
                 humidity: humidity[index],
