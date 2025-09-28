@@ -1,10 +1,10 @@
-import { config } from "./config.js";
+import { apiUrls } from "./apiUrls.js";
 const re = /<script\stype="application\/json">([\s\S]*?)<\/script>/g;
 
 
 async function getKeys() {
     try {
-        const resp = await fetch(config.marktGuruBaseUrl);
+        const resp = await fetch(apiUrls.marktGuruBaseUrl);
         const text = await resp.text();
         const matches = [...text.matchAll(re)];
         const configStr = matches.length ? matches[matches.length - 1][1] : '';
@@ -32,7 +32,7 @@ async function getClient() {
         'x-apikey': keys.apiKey,
         'x-clientkey': keys.clientKey
     };
-    const baseUrl = config.marktGuruApiUrl;
+    const baseUrl = apiUrls.marktGuruApiUrl;
     // Gibt ein Objekt zurück, das für API-Requests genutzt werden kann
     return {
         baseUrl,
@@ -53,7 +53,7 @@ async function search(query = '', options = {}) {
         q: query,
         ...opts
     });
-    const url = config.marktGuruSearchUrl(params.toString());;
+    const url = apiUrls.marktGuruSearchUrl(params.toString());;
     const response = await fetch(url, {
         method: 'GET',
         headers: client.headers,

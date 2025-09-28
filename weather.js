@@ -1,4 +1,4 @@
-import { config } from "./config.js";
+import { apiUrls } from "./apiUrls.js";
 
 // Holt aktuelle Wetterdaten von Open-Meteo für eine bestimmte Koordinate
 export async function fetchWeather(lat, lon) {
@@ -8,7 +8,7 @@ export async function fetchWeather(lat, lon) {
     // precipitation_probability, precipitation, weather_code,
     // wind_speed_10m, wind_direction_10m, 
     // apparent_temperature
-    const url = config.weatherApiUrl(lat, lon);
+    const url = apiUrls.weatherApiUrl(lat, lon);
     const response = await fetch(url);
     if (!response.ok) {
         throw new Error(`Fehler beim Abrufen der Wetterdaten: ${response.status}`);
