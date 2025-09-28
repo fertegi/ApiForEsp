@@ -7,9 +7,9 @@
             "offers": 82800
         },
         "features": {
-            "weather": true,
+            "weather": false,
             "bvg": true,
-            "offers": true
+            "offers": false
         }
     },
     "location": {

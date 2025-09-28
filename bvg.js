@@ -1,5 +1,4 @@
 import { parseTime, deltaFromNow } from "./util_time.js";
-import { config } from "./config.js";
 import { createClient } from 'hafas-client'
 import { profile as bvgProfile } from 'hafas-client/p/bvg/index.js'
 
