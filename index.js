@@ -14,10 +14,11 @@ const PORT = process.env.PORT || 3000;
 
 // Config laden
 function loadConfig(deviceId) {
-    const configPath = join(__dirname, 'config.json');
+    const configPath = join(__dirname, "/configs/") + deviceId + ".json";
+    console.log("Loading config from ", configPath);
     try {
         const data = readFileSync(configPath, 'utf-8');
-        const config = JSON.parse(data).find(c => c.deviceId === deviceId);
+        const config = JSON.parse(data);
         if (!config) {
             throw new Error('Gerät nicht gefunden');
         }
@@ -28,16 +29,14 @@ function loadConfig(deviceId) {
 }
 
 
-
 app.get('/api/config', (req, res) => {
     const deviceId = req.query.deviceId || 'defaultDevice';
     if (!deviceId) {
         return res.status(400).json({ error: 'Geräte-ID ist erforderlich.' });
     }
     // Konfiguration für das angegebene Gerät laden
-    console.log(`Lade Konfiguration für Gerät: ${deviceId}`);
     const config = loadConfig(deviceId);
-    res.json(config);
+    res.json(config.deviceConfiguration || {});
 });
 
 

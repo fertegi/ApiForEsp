@@ -1,15 +1,17 @@
 [
     {
         "deviceId": "esp32-001",
-        "intervals": {
-            "weather": 1800,
-            "bvg": 30,
-            "offers": 82800
-        },
-        "features": {
-            "weather": true,
-            "bvg": true,
-            "offers": true
+        "deviceConfiguration": {
+            "intervals": {
+                "weather": 1800,
+                "bvg": 30,
+                "offers": 82800
+            },
+            "features": {
+                "weather": true,
+                "bvg": true,
+                "offers": true
+            }
         },
         "location": {
             "zipCode": "10249",
