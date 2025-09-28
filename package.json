@@ -14,7 +14,9 @@
   "dependencies": {
     "express": "^5.1.0",
     "hafas-client": "^6.3.5",
-    "luxon": "^3.6.1"
+    "luxon": "^3.6.1",
+    "mongodb": "^6.20.0",
+    "node-cache": "^5.1.2"
   },
   "type": "module"
 }

@@ -1,40 +1,34 @@
 import express from 'express';
-import { readFileSync } from 'fs';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
 import { mapByRetailers, searchByConfig } from './marktguru.js';
 import { getAllDepartures } from './bvg.js';
 import { fetchWeather } from './weather.js';
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
+import { loadConfig } from './configLoader.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Config laden
-function loadConfig(deviceId) {
-    const configPath = join(__dirname, "/configs/") + deviceId + ".json";
-    try {
-        const data = readFileSync(configPath, 'utf-8');
-        const config = JSON.parse(data);
-        if (!config) {
-            throw new Error('Gerät nicht gefunden');
-        }
-        return config;
-    } catch (err) {
-        return { error: 'Konfigurationsdatei nicht gefunden oder ungültig.' };
-    }
-}
+// // Config laden
+// function loadConfig(deviceId) {
+//     const configPath = join(__dirname, "/configs/") + deviceId + ".json";
+//     try {
+//         const data = readFileSync(configPath, 'utf-8');
+//         const config = JSON.parse(data);
+//         if (!config) {
+//             throw new Error('Gerät nicht gefunden');
+//         }
+//         return config;
+//     } catch (err) {
+//         return { error: 'Konfigurationsdatei nicht gefunden oder ungültig.' };
+//     }
+// }
 
 
-app.get('/api/config', (req, res) => {
+app.get('/api/config', async (req, res) => {
     const deviceId = req.query.deviceId || 'defaultDevice';
     if (!deviceId) {
         return res.status(400).json({ error: 'Geräte-ID ist erforderlich.' });
     }
-    // Konfiguration für das angegebene Gerät laden
-    const config = loadConfig(deviceId);
+    const config = await loadConfig(deviceId);
     res.json(config.deviceConfiguration || {});
 });
 
@@ -46,7 +40,7 @@ app.get("/api/marktguru", async (req, res) => {
             return res.status(400).json({ error: 'Geräte-ID ist erforderlich.' });
         }
 
-        const config = loadConfig(deviceId);
+        const config = await loadConfig(deviceId);
         if (config.error) {
             return res.status(500).json(config);
         }
@@ -62,7 +56,7 @@ app.get("/api/marktguru", async (req, res) => {
         }));
 
         offersResults = mapByRetailers(offersResults.flat());
-        console.log(`Anzahl der Angebote insgesamt: ${offersResults}`);
+        console.log(`Anzahl der Angebote insgesamt: ${offersResults.length}`);
 
 
         res.json(offersResults);
@@ -82,7 +76,7 @@ app.get("/api/bvg", async (req, res) => {
             return res.status(400).json({ error: 'Geräte-ID ist erforderlich.' });
         }
 
-        const config = loadConfig(deviceId);
+        const config = await loadConfig(deviceId);
         if (config.error) {
             return res.status(500).json(config);
         }
@@ -109,7 +103,7 @@ app.get('/api/weather', async (req, res) => {
             return res.status(400).json({ error: 'Geräte-ID ist erforderlich.' });
         }
 
-        const config = loadConfig(deviceId);
+        const config = await loadConfig(deviceId);
         if (config.error) {
             return res.status(500).json(config);
         }
