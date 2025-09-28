@@ -1,84 +1,82 @@
-[
-    {
-        "deviceId": "esp32-001",
-        "deviceConfiguration": {
-            "intervals": {
-                "weather": 1800,
-                "bvg": 30,
-                "offers": 82800
+{
+    "deviceId": "esp32-001",
+    "deviceConfiguration": {
+        "intervals": {
+            "weather": 1800,
+            "bvg": 30,
+            "offers": 82800
+        },
+        "features": {
+            "weather": true,
+            "bvg": true,
+            "offers": true
+        }
+    },
+    "location": {
+        "zipCode": "10249",
+        "latitude": 52.474,
+        "longitude": 13.426
+    },
+    "marktguru": {
+        "retailers": [
+            "rewe",
+            "aldi-nord",
+            "netto-marken-discount",
+            "kaufland",
+            "lidl"
+        ],
+        "searchKeywords": [
+            "pepsi",
+            "adidas"
+        ]
+    },
+    "bvg": {
+        "resultCount": 5,
+        "stops": [
+            {
+                "id": "900079201",
+                "name": "Leinestraße",
+                "lines": [
+                    {
+                        "name": "U8",
+                        "id": "de-vbb-11000000-u-bahn-u8",
+                        "product": "subway"
+                    }
+                ]
             },
-            "features": {
-                "weather": true,
-                "bvg": true,
-                "offers": true
+            {
+                "id": "900079203",
+                "name": "Herrfurthstraße",
+                "lines": [
+                    {
+                        "name": "M43",
+                        "id": "de-vbb-11000000-bus-m43",
+                        "product": "bus"
+                    }
+                ]
+            },
+            {
+                "id": "900079221",
+                "name": "Herrmannstraße",
+                "lines": [
+                    {
+                        "name": "S42",
+                        "id": "de-vbb-11000000-s-bahn-s42",
+                        "product": "suburban"
+                    },
+                    {
+                        "name": "S41",
+                        "id": "de-vbb-11000000-s-bahn-s41",
+                        "product": "suburban"
+                    },
+                    {
+                        "name": "246",
+                        "id": "de-vbb-11000000-bus-246",
+                        "product": "bus"
+                    }
+                ]
             }
-        },
-        "location": {
-            "zipCode": "10249",
-            "latitude": 52.474,
-            "longitude": 13.426
-        },
-        "marktguru": {
-            "retailers": [
-                "rewe",
-                "aldi-nord",
-                "netto-marken-discount",
-                "kaufland",
-                "lidl"
-            ],
-            "searchKeywords": [
-                "pepsi",
-                "adidas"
-            ]
-        },
-        "bvg": {
-            "resultCount": 5,
-            "stops": [
-                {
-                    "id": "900079201",
-                    "name": "Leinestraße",
-                    "lines": [
-                        {
-                            "name": "U8",
-                            "id": "de-vbb-11000000-u-bahn-u8",
-                            "product": "subway"
-                        }
-                    ]
-                },
-                {
-                    "id": "900079203",
-                    "name": "Herrfurthstraße",
-                    "lines": [
-                        {
-                            "name": "M43",
-                            "id": "de-vbb-11000000-bus-m43",
-                            "product": "bus"
-                        }
-                    ]
-                },
-                {
-                    "id": "900079221",
-                    "name": "Herrmannstraße",
-                    "lines": [
-                        {
-                            "name": "S42",
-                            "id": "de-vbb-11000000-s-bahn-s42",
-                            "product": "suburban"
-                        },
-                        {
-                            "name": "S41",
-                            "id": "de-vbb-11000000-s-bahn-s41",
-                            "product": "suburban"
-                        },
-                        {
-                            "name": "246",
-                            "id": "de-vbb-11000000-bus-246",
-                            "product": "bus"
-                        }
-                    ]
-                }
-            ]
-        },
-        "weather": {}
-    }
-]
+        ]
+    },
+    "weather": {}
+}
