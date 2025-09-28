@@ -4,16 +4,19 @@ export function parseTime(whenStr) {
     // Versucht, einen ISO-String oder andere Zeitformate zu parsen
     if (!whenStr) return null;
     try {
-        // Luxon erwartet ISO 8601, sonst versuchen wir es als Date
-        const dt = DateTime.fromISO(whenStr, { zone: 'Europe/Berlin' });
-        if (dt.isValid) return dt;
-        // Fallback: Date-Objekt
-        const jsDate = new Date(whenStr);
-        if (!isNaN(jsDate)) return DateTime.fromJSDate(jsDate, { zone: 'Europe/Berlin' });
+        // 1) ISO mit Offset z.B. "2025-09-28T20:58:00+02:00" direkt parsen (Offset bleibt erhalten)
+        let dt = DateTime.fromISO(whenStr);
+        // 2) Falls fromISO ungültig ist, Fallback auf JS-Date
+        if (!dt.isValid) {
+            const jsDate = new Date(whenStr);
+            if (!isNaN(jsDate)) dt = DateTime.fromJSDate(jsDate);
+        }
+        // 3) Konvertiere auf Europe/Berlin (so haben wir eine konsistente Zone)
+        if (dt && dt.isValid) return dt.setZone('Europe/Berlin');
     } catch (e) {
-        // Fehler beim Parsen
+        console.log(`Error parsing time ${whenStr}: ${e} `);
+        // Fehler beim Parsen — still fail null
     }
-    return null;
 }
 
 export function deltaFromNow(dt) {

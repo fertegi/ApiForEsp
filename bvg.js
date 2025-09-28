@@ -1,28 +1,15 @@
 import { parseTime, deltaFromNow } from "./util_time.js";
 import { config } from "./config.js";
+import { createClient } from 'hafas-client'
+import { profile as bvgProfile } from 'hafas-client/p/bvg/index.js'
 
-export async function fetchDepartures(stopId, resultCount = 5) {
-    const baseUrl = config.bvgApiUrl(stopId, resultCount);
 
-    if (!baseUrl) {
-        console.log('Base URL not configured in config.json');
-        return [];
-    }
-    const url = baseUrl.replace('{id}', stopId).replace('{result_count}', resultCount);
-    let response;
-    try {
-        response = await fetch(url, { timeout: 5000 });
-        if (response.ok) {
-            const json = await response.json();
-            return json.departures || [];
-        } else {
-            console.log(`Failed to fetch departures for stop ${stopId}, status code: ${response.status} `);
-        }
-    } catch (e) {
-        let text = response ? await response.text() : 'None';
-        console.log(`Error fetching data for stop ${stopId}: ${e} - response was ${text} `);
-    }
-    return [];
+export async function fetchDepartures(stopId, duration = 10) {
+    const userAgent = "bumaye@zoho.eu"
+    const client = createClient(bvgProfile, userAgent)
+    const res = await client.departures(stopId, { when: new Date(), duration: duration })
+
+    return res.departures || [];
 }
 
 export function groupDepartures(departures, userLines) {
@@ -62,7 +49,7 @@ export function groupDepartures(departures, userLines) {
                 }
             }
         } else {
-            console.log(`Invalid time format for departure: ${departure.when} `);
+            console.log(`Could not parse time for departure: ${JSON.stringify(departure.when)} `);
         }
     }
     // Sicherstellen, dass jede konfigurierte user_line vertreten ist
@@ -99,7 +86,6 @@ export async function getAllDepartures(stops) {
         console.log('No locations found in config.json');
         return data;
     }
-    console.log(`Processing ${locs.length} locations...`);
     for (const loc of locs) {
         const userLines = loc.lines || [];
         const stopId = loc.id;
@@ -107,19 +93,18 @@ export async function getAllDepartures(stops) {
             console.log(`StopID missing for location: ${JSON.stringify(loc)} `);
             continue;
         }
-        console.log(`Fetching departures for stop ID: ${stopId} with user lines: ${JSON.stringify(userLines)} `);
         let departures = [];
         try {
             departures = await fetchDepartures(stopId);
         } catch (e) {
             console.log(`Error fetching departures for stop ${stopId}: ${e} `);
         }
-        console.log('Finished Fetching');
         if (departures && departures.length) {
             const finalList = groupDepartures(departures, userLines);
             data.push(...finalList);
         }
     }
     const postprocessedData = postprocessData(data);
+
     return postprocessedData.length ? postprocessedData : [];
 }

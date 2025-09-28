@@ -15,7 +15,6 @@ const PORT = process.env.PORT || 3000;
 // Config laden
 function loadConfig(deviceId) {
     const configPath = join(__dirname, "/configs/") + deviceId + ".json";
-    console.log("Loading config from ", configPath);
     try {
         const data = readFileSync(configPath, 'utf-8');
         const config = JSON.parse(data);
@@ -88,9 +87,8 @@ app.get("/api/bvg", async (req, res) => {
             return res.status(500).json(config);
         }
 
-        const { bvg: options = {} } = config;
-        const { stops = [] } = options;
 
+        const stops = config.bvg.stops || [];
         const departures = await getAllDepartures(stops);
         if (!departures || departures.length === 0) {
             return res.status(404).json({ message: 'Keine Abfahrten gefunden.' });
