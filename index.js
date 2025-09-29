@@ -7,22 +7,6 @@ import { loadConfig } from './configLoader.js';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// // Config laden
-// function loadConfig(deviceId) {
-//     const configPath = join(__dirname, "/configs/") + deviceId + ".json";
-//     try {
-//         const data = readFileSync(configPath, 'utf-8');
-//         const config = JSON.parse(data);
-//         if (!config) {
-//             throw new Error('Gerät nicht gefunden');
-//         }
-//         return config;
-//     } catch (err) {
-//         return { error: 'Konfigurationsdatei nicht gefunden oder ungültig.' };
-//     }
-// }
-
-
 app.get('/api/config', async (req, res) => {
     const deviceId = req.query.deviceId || 'defaultDevice';
     if (!deviceId) {
@@ -65,9 +49,6 @@ app.get("/api/marktguru", async (req, res) => {
         res.status(500).json({ error: 'Fehler beim Abrufen der Ergebnisse.' });
     }
 });
-
-
-
 
 app.get("/api/bvg", async (req, res) => {
     try {
