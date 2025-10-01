@@ -11,63 +11,87 @@ export async function fetchDepartures(stopId, duration = 10) {
     return res.departures || [];
 }
 
+function isLineAllowed(departure, userLines) {
+    if (!userLines || userLines.length === 0) return true;
+
+    const lineInfo = departure.line || {};
+    const lineId = lineInfo.id || '';
+    const name = lineInfo.name || 'No Name';
+
+    return userLines.some(ul =>
+        (ul.id && ul.id === lineId) || (ul.name && ul.name === name)
+    );
+}
+
+function createDepartureEntry(departure) {
+    const lineInfo = departure.line || {};
+    const name = lineInfo.name || 'No Name';
+    const destination = (departure.destination && departure.destination.name) || 'No Destination';
+    const when = parseTime(departure.when || '');
+
+    if (!when) {
+        console.log(`Could not parse time for departure: ${JSON.stringify(departure.when)}`);
+        return null;
+    }
+
+    const delta = deltaFromNow(when);
+    if (!Array.isArray(delta) || delta.length < 2) return null;
+
+    const [hours, minutes] = delta;
+    const totalMinutes = hours * 60 + minutes;
+
+    if (totalMinutes < 0) return null;
+
+    return {
+        key: `${name}| ${destination} `,
+        entry: {
+            line: name,
+            destination,
+            departure_delta: totalMinutes,
+            departure_str: hours === 0 ? `${minutes} min` : `${hours}h ${minutes} min`
+        }
+    };
+}
+
+function addMissingUserLines(grouped, userLines) {
+    if (!userLines || userLines.length === 0) return;
+
+    for (const ul of userLines) {
+        const ulName = ul.name || '?';
+        const lineExists = Object.keys(grouped).some(key => key.split('|')[0] === ulName);
+
+        if (!lineExists) {
+            const key = `${ulName}| `;
+            grouped[key] = {
+                line: ulName,
+                destination: '',
+                departure_delta: 9999,
+                departure_str: '--'
+            };
+        }
+    }
+}
+
 export function groupDepartures(departures, userLines) {
     const grouped = {};
+
     for (const departure of departures) {
-        const lineInfo = departure.line || {};
-        const lineId = lineInfo.id || '';
-        const name = lineInfo.name || 'No Name';
-        if (userLines && userLines.length > 0) {
-            const found = userLines.some(ul =>
-                (ul.id && ul.id === lineId) || (ul.name && ul.name === name)
-            );
-            if (!found) continue;
-        }
-        const destination = (departure.destination && departure.destination.name) || 'No Destination';
-        const when = parseTime(departure.when || '');
-        if (when) {
-            const delta = deltaFromNow(when);
-            if (Array.isArray(delta) && delta.length >= 2) {
-                const [hours, minutes] = delta;
-                const totalMinutes = hours * 60 + minutes;
-                if (totalMinutes >= 0) {
-                    const key = `${name}| ${destination} `;
-                    const entry = {
-                        line: name,
-                        destination,
-                        departure_delta: totalMinutes,
-                        departure_str: hours === 0 ? `${minutes} min` : `${hours}h ${minutes} min`
-                    };
-                    if (grouped[key]) {
-                        if (totalMinutes < grouped[key].departure_delta) {
-                            grouped[key] = entry;
-                        }
-                    } else {
-                        grouped[key] = entry;
-                    }
-                }
-            }
-        } else {
-            console.log(`Could not parse time for departure: ${JSON.stringify(departure.when)} `);
+        if (!isLineAllowed(departure, userLines)) continue;
+
+        const result = createDepartureEntry(departure);
+        if (!result) continue;
+
+        const { key, entry } = result;
+
+        // Nur die nächste Abfahrt pro Linie/Ziel behalten
+        if (!grouped[key] || entry.departure_delta < grouped[key].departure_delta) {
+            grouped[key] = entry;
         }
     }
-    // Sicherstellen, dass jede konfigurierte user_line vertreten ist
-    if (userLines && userLines.length > 0) {
-        for (const ul of userLines) {
-            const ulName = ul.name || '?';
-            if (!Object.keys(grouped).some(key => key.split('|')[0] === ulName)) {
-                const key = `${ulName}| `;
-                grouped[key] = {
-                    line: ulName,
-                    destination: '',
-                    departure_delta: 9999,
-                    departure_str: '--'
-                };
-            }
-        }
-    }
+
+    addMissingUserLines(grouped, userLines);
+
     const finalList = Object.values(grouped);
-    finalList.sort((a, b) => a.departure_delta - b.departure_delta);
     return finalList;
 }
 
@@ -104,6 +128,11 @@ export async function getAllDepartures(stops) {
         }
     }
     const postprocessedData = postprocessData(data);
+
+    // Sicherstellen, dass das kombinierte Ergebnis global nach departure_delta sortiert ist
+    if (postprocessedData && postprocessedData.length) {
+        postprocessedData.sort((a, b) => (a.departure_delta ?? 9999) - (b.departure_delta ?? 9999));
+    }
 
     return postprocessedData.length ? postprocessedData : [];
 }
