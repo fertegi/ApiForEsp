@@ -1,6 +1,3 @@
-import { app } from "../index.js";
-
-
 
 export function setupUserRoutes(app) {
 
