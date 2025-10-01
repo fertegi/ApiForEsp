@@ -84,7 +84,7 @@ export async function searchByConfig(config) {
         allowedRetailers: retailers.length > 0 ? retailers : undefined
     };
     const results = await search(query, options);
-    console.log("raw result ", results)
+
     const response = [];
     const seenKeys = new Set();
     for (const result of results) {
@@ -101,6 +101,7 @@ export async function searchByConfig(config) {
                 retailer,
                 description,
                 keyword: query,
+                url: `${apiUrls.marktGuruBaseUrl}/offers/${result.id}`
             });
         }
     }
