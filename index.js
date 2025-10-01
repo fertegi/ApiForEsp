@@ -4,6 +4,11 @@ import { getAllDepartures } from './bvg.js';
 import { fetchWeather } from './weather.js';
 import { loadConfig } from './configLoader.js';
 import { setupUserRoutes } from "./user/userRoutes.js"
+import { setupFirmwareRoutes } from './firmware/firmwareRoutes.js';
+import { configDotenv } from 'dotenv';
+
+configDotenv();
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -113,6 +118,7 @@ app.get('/api/time', (req, res) => {
 });
 
 setupUserRoutes(app);
+setupFirmwareRoutes(app);
 
 app.listen(PORT, () => {
     console.log(`Server läuft auf Port ${PORT}`);
