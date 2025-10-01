@@ -3,9 +3,16 @@ import { mapByRetailers, searchByConfig } from './marktguru.js';
 import { getAllDepartures } from './bvg.js';
 import { fetchWeather } from './weather.js';
 import { loadConfig } from './configLoader.js';
+import { setupUserRoutes } from "./user/userRoutes.js"
 
-const app = express();
+export const app = express();
 const PORT = process.env.PORT || 3000;
+
+
+
+app.get("/api", (req, res) => {
+    res.send("API is working");
+});
 
 app.get('/api/config', async (req, res) => {
     const deviceId = req.query.deviceId || 'defaultDevice';
@@ -17,7 +24,7 @@ app.get('/api/config', async (req, res) => {
 });
 
 
-app.get("/api/marktguru", async (req, res) => {
+app.get("/api/offers", async (req, res) => {
     try {
         const deviceId = req.query.deviceId || 'defaultDevice';
         if (!deviceId) {
@@ -29,19 +36,17 @@ app.get("/api/marktguru", async (req, res) => {
             return res.status(500).json(config);
         }
 
-        const { marktguru: options = {} } = config;
+        const { offers: options = {} } = config;
         const { searchKeywords: keyWords = [], retailers = [] } = options;
         const zipCode = (config.location && config.location.zipCode) || '60487';
 
         let offersResults = await Promise.all(keyWords.map(async keyWord => {
             const offers = await searchByConfig({ keyWord, retailers, zipCode });
-            console.log(`Ergebnisse für ${keyWord}:`, offers.length);
             return offers;
         }));
 
         offersResults = mapByRetailers(offersResults.flat());
-        console.log(`Anzahl der Angebote insgesamt: ${offersResults.length}`);
-
+        console.log(offersResults);
 
         res.json(offersResults);
     } catch (error) {
@@ -50,7 +55,7 @@ app.get("/api/marktguru", async (req, res) => {
     }
 });
 
-app.get("/api/bvg", async (req, res) => {
+app.get("/api/departures", async (req, res) => {
     try {
         const deviceId = req.query.deviceId || 'defaultDevice';
         if (!deviceId) {
@@ -63,7 +68,7 @@ app.get("/api/bvg", async (req, res) => {
         }
 
 
-        const stops = config.bvg.stops || [];
+        const stops = config.departures.stops || [];
         const departures = await getAllDepartures(stops);
         if (!departures || departures.length === 0) {
             return res.status(404).json({ message: 'Keine Abfahrten gefunden.' });
@@ -106,6 +111,8 @@ app.get('/api/weather', async (req, res) => {
 app.get('/api/time', (req, res) => {
     res.json({ time: new Date().toISOString() });
 });
+
+setupUserRoutes(app);
 
 app.listen(PORT, () => {
     console.log(`Server läuft auf Port ${PORT}`);
