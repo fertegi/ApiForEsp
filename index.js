@@ -2,10 +2,15 @@ import express from 'express';
 import { mapByRetailers, searchByConfig } from './marktguru.js';
 import { getAllDepartures } from './bvg.js';
 import { fetchWeather } from './weather.js';
-import { loadConfig } from './configLoader.js';
+import {
+    isDeviceRegistered,
+    requireRegisteredDevice,
+    requireRegisteredDeviceWithConfig
+} from './configLoader.js';
 import { setupUserRoutes } from "./user/userRoutes.js"
 import { setupFirmwareRoutes } from './firmware/firmwareRoutes.js';
 import { configDotenv } from 'dotenv';
+import { isRedisHealthy } from './redisClient.js';
 
 configDotenv();
 
@@ -14,29 +19,29 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 
+app.use("/api/firmware/*splat", requireRegisteredDevice);
+app.use("/api/*splat", requireRegisteredDeviceWithConfig);
 
 app.get("/api", (req, res) => {
     res.send("API is working");
 });
 
-app.get('/api/config', async (req, res) => {
-    const deviceId = req.query.deviceId || 'defaultDevice';
-    if (!deviceId) {
+app.get('/api/config/', async (req, res) => {
+    const { deviceId, config } = req;
+    if (!deviceId || deviceId === 'defaultDevice') {
         return res.status(400).json({ error: 'Geräte-ID ist erforderlich.' });
     }
-    const config = await loadConfig(deviceId);
+
     res.json(config.deviceConfiguration || {});
 });
 
 
 app.get("/api/offers", async (req, res) => {
     try {
-        const deviceId = req.query.deviceId || 'defaultDevice';
-        if (!deviceId) {
+        const { deviceId, config } = req;
+        if (!deviceId || deviceId === 'defaultDevice') {
             return res.status(400).json({ error: 'Geräte-ID ist erforderlich.' });
         }
-
-        const config = await loadConfig(deviceId);
         if (config.error) {
             return res.status(500).json(config);
         }
@@ -51,8 +56,6 @@ app.get("/api/offers", async (req, res) => {
         }));
 
         offersResults = mapByRetailers(offersResults.flat());
-        console.log(offersResults);
-
         res.json(offersResults);
     } catch (error) {
         console.error('Fehler beim Abrufen der Ergebnisse:', error);
@@ -62,16 +65,13 @@ app.get("/api/offers", async (req, res) => {
 
 app.get("/api/departures", async (req, res) => {
     try {
-        const deviceId = req.query.deviceId || 'defaultDevice';
+        const { deviceId, config } = req;
         if (!deviceId) {
             return res.status(400).json({ error: 'Geräte-ID ist erforderlich.' });
         }
-
-        const config = await loadConfig(deviceId);
         if (config.error) {
             return res.status(500).json(config);
         }
-
 
         const stops = config.departures.stops || [];
         const departures = await getAllDepartures(stops);
@@ -86,15 +86,12 @@ app.get("/api/departures", async (req, res) => {
     }
 });
 
-
 app.get('/api/weather', async (req, res) => {
     try {
-        const deviceId = req.query.deviceId || 'defaultDevice';
+        const { deviceId, config } = req;
         if (!deviceId) {
             return res.status(400).json({ error: 'Geräte-ID ist erforderlich.' });
         }
-
-        const config = await loadConfig(deviceId);
         if (config.error) {
             return res.status(500).json(config);
         }
@@ -111,6 +108,25 @@ app.get('/api/weather', async (req, res) => {
         console.error('Fehler beim Abrufen der Wetterdaten:', error);
         res.status(500).json({ error: 'Fehler beim Abrufen der Wetterdaten.' });
     }
+});
+
+
+// ...existing code...
+
+app.get("/api/debug/cache", async (req, res) => {
+    const redisHealthy = await isRedisHealthy();
+
+    res.json({
+        redis: {
+            healthy: redisHealthy,
+            enabled: !!process.env.UPSTASH_REDIS_REST_URL
+        },
+        timestamp: new Date().toISOString(),
+        process: {
+            uptime: process.uptime(),
+            memoryUsage: process.memoryUsage()
+        }
+    });
 });
 
 app.get('/api/time', (req, res) => {
