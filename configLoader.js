@@ -4,7 +4,7 @@ import { getCached, setCached, deleteCached } from "./redisClient.js";
 // Fallback: Request-lokaler Cache falls Redis nicht verfügbar
 const requestCache = new Map();
 
-TTL_SECONDS_CONFIG = 6000; // 100 Minuten
+const TTL_SECONDS_CONFIG = 6000; // 100 Minuten
 
 export function invalidateRequestCache() {
     requestCache.clear();
