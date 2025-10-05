@@ -121,7 +121,7 @@ export async function loadConfig(deviceId) {
 
     // 2. Request-lokaler Cache check (Fallback)
     if (requestCache.has(deviceId)) {
-        console.log("Request-cached config used for deviceId:", deviceId);
+        console.log(" Request-cached config used for deviceId:", deviceId);
         return requestCache.get(deviceId);
     }
 
