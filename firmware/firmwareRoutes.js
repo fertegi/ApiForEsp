@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import crypto from 'crypto'; // neu: für SHA256-Prüfung
 
+
 const owner = process.env.FW_REPO_OWNER || "fertegi";
 const repo = process.env.FW_REPO_NAME || "ESP32_YourWatcher";
 
@@ -11,6 +12,18 @@ function validateGitHubToken() {
     }
     return process.env.GITHUB_TOKEN;
 }
+
+function isVersionNewer(currentVersion, latestVersion) {
+    if (!currentVersion) return true;
+
+    // Einfacher Versionsvergleich (z.B. "v1.2.3" vs "v1.2.4")
+    const cleanCurrent = currentVersion.replace(/^v/, '');
+    const cleanLatest = latestVersion.replace(/^v/, '');
+
+    return cleanCurrent !== cleanLatest;
+}
+
+
 
 async function fetchLatestRelease() {
     const token = validateGitHubToken();
@@ -118,7 +131,6 @@ export function setupFirmwareRoutes(app) {
     app.get("/api/firmware", (req, res) => {
         res.send("Firmware endpoint is working");
     });
-
 
 
     app.get("/api/firmware/latest", async (req, res) => {
