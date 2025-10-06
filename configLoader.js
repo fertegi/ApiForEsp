@@ -1,5 +1,5 @@
-import { getDatabase } from "./mongoClient.js";
-import { getCached, setCached, deleteCached } from "./redisClient.js";
+import { getDatabase, getAllDevices } from "./clients/mongoClient.js";
+import { getCached, setCached, deleteCached } from "./clients/redisClient.js";
 
 // Fallback: Request-lokaler Cache falls Redis nicht verfügbar
 const requestCache = new Map();

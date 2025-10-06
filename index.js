@@ -1,16 +1,12 @@
 import express from 'express';
-import { mapByRetailers, searchByConfig } from './marktguru.js';
-import { getAllDepartures } from './bvg.js';
-import { fetchWeather } from './weather.js';
-import {
-    isDeviceRegistered,
-    requireRegisteredDevice,
-    requireRegisteredDeviceWithConfig
-} from './configLoader.js';
+import { getOffersFromConfig } from './apps/marktguru.js';
+import { getAllDepartures } from './apps/bvg.js';
+import { fetchWeather } from './apps/weather.js';
+import { requireRegisteredDevice, requireRegisteredDeviceWithConfig } from "./configLoader.js"
 import { setupUserRoutes } from "./user/userRoutes.js"
 import { setupFirmwareRoutes } from './firmware/firmwareRoutes.js';
 import { configDotenv } from 'dotenv';
-import { isRedisHealthy } from './redisClient.js';
+import { isRedisHealthy } from './clients/redisClient.js';
 
 configDotenv();
 
@@ -31,7 +27,6 @@ app.get('/api/config/', async (req, res) => {
     if (!deviceId || deviceId === 'defaultDevice') {
         return res.status(400).json({ error: 'Geräte-ID ist erforderlich.' });
     }
-
     res.json(config.deviceConfiguration || {});
 });
 
@@ -45,18 +40,11 @@ app.get("/api/offers", async (req, res) => {
         if (config.error) {
             return res.status(500).json(config);
         }
-
-        const { offers: options = {} } = config;
-        const { searchKeywords: keyWords = [], retailers = [] } = options;
-        const zipCode = (config.location && config.location.zipCode) || '60487';
-
-        let offersResults = await Promise.all(keyWords.map(async keyWord => {
-            const offers = await searchByConfig({ keyWord, retailers, zipCode });
-            return offers;
-        }));
-
-        offersResults = mapByRetailers(offersResults.flat());
-        res.json(offersResults);
+        const offers = await getOffersFromConfig(config);
+        if (!offers || offers.length === 0) {
+            return res.status(404).json({ message: 'Keine Angebote in der Konfiguration gefunden.' });
+        }
+        res.json(offers);
     } catch (error) {
         console.error('Fehler beim Abrufen der Ergebnisse:', error);
         res.status(500).json({ error: 'Fehler beim Abrufen der Ergebnisse.' });
@@ -127,10 +115,6 @@ app.get("/api/debug/cache", async (req, res) => {
             memoryUsage: process.memoryUsage()
         }
     });
-});
-
-app.get('/api/time', (req, res) => {
-    res.json({ time: new Date().toISOString() });
 });
 
 setupUserRoutes(app);
