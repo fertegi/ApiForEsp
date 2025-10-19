@@ -161,5 +161,5 @@ async function _getOffersFromConfig(config) {
     return offersResults;
 }
 
-
-export const getOffersFromConfig = cached(6000)(_getOffersFromConfig);
+const TTL_OFFERS = 6000; // 100 minutes
+export const getOffersFromConfig = cached(TTL_OFFERS)(_getOffersFromConfig);
