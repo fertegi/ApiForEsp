@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - ESP32 Manager</title>
+    <link rel="stylesheet" href="/css/global.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="login-form">
+            <h2>Anmelden</h2>
+
+            <% if (locals.error) { %>
+                <div class="error-message">
+                    <%= error %>
+                </div>
+                <% } %>
+
+                    <% if (locals.success) { %>
+                        <div class="success-message">
+                            <%= success %>
+                        </div>
+                        <% } %>
+
+                            <form action="/user/login" method="POST">
+                                <div class="form-group">
+                                    <label for="username">Benutzername</label>
+                                    <input type="text" id="username" name="username" required autofocus>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="password">Passwort</label>
+                                    <input type="password" id="password" name="password" required>
+                                </div>
+
+                                <button type="submit" class="btn-login">Anmelden</button>
+                            </form>
+        </div>
+    </div>
+</body>
+
+</html>

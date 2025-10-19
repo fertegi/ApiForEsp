@@ -1,0 +1,148 @@
+:root {
+    --btn-color: #2196f3;
+    --dark-color: #0d47a1;
+    --light-color: #bbdefb;
+    --danger-color: #f44336;
+    --success-color: #4caf50;
+    --gray-color: #f5f5f5;
+    --border-color: #b421f3;
+    --background-color: rgb(45, 2, 62);
+    --text-color: #ffffff;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+
+.container {
+    width: 100%;
+    max-width: 400px;
+    padding: 0 15px;
+}
+
+.login-form {
+    text-align: center;
+}
+
+.login-form h1 {
+    margin-bottom: 1rem;
+    font-weight: 300;
+    color: var(--text-color);
+}
+
+
+h2 {
+    margin-bottom: 1.5rem;
+    color: var(--text-color);
+}
+
+.form-group {
+    margin-bottom: 1.2rem;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-color);
+
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border 0.3s;
+}
+
+.form-group input:focus {
+    border-color: var(--btn-color);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.25);
+}
+
+.btn-login {
+    display: inline-block;
+    background: var(--btn-color);
+    color: #fff;
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    width: 100%;
+    margin-top: 1rem;
+    transition: background 0.3s;
+}
+
+.btn-login:hover {
+    background: var(--dark-color);
+}
+
+.error-message {
+    background-color: #ffebee;
+    color: var(--danger-color);
+    padding: 0.8rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+
+.success-message {
+    background-color: #e8f5e9;
+    color: var(--success-color);
+    padding: 0.8rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-image: url('/bg.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.container {
+    text-align: center;
+    background: var(--background-color);
+    /* Leicht transparenter Hintergrund */
+    border-radius: 50px;
+    border-style: solid;
+    border-color: var(--border-color);
+    border-width: 2px;
+    box-shadow: 0 0px 50px 10px rgba(0, 0, 0, .7);
+    padding: 2rem;
+    max-width: 500px;
+}
+
+h1 {
+    color: var(--border-color);
+    margin-bottom: 1rem;
+}
+
+p {
+    margin-bottom: 1.5rem;
+    color: white;
+}
+
+.api-status {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background-color: #e8f5e9;
+    color: #4caf50;
+    border-radius: 4px;
+    font-weight: 500;
+}
