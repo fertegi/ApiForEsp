@@ -4,10 +4,9 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import { isRedisHealthy } from './clients/redisClient.js';
-
+import cookieParser from 'cookie-parser';
 
 import { requireRegisteredDevice, requireRegisteredDeviceWithConfig } from "./middlewares/deviceMiddleware.js"
-import { sessionMiddleware } from './middlewares/sessionMiddleware.js';
 
 import { getOffersFromConfig } from './services/marktguru.js';
 import { getAllDepartures } from './services/bvg.js';
@@ -16,6 +15,7 @@ import { fetchWeather } from './services/weather.js';
 import { setupUserRoutes } from "./user/userRoutes.js"
 import { setupFirmwareRoutes } from './firmware/firmwareRoutes.js';
 import { setupAuthRoutes } from './user/authRoutes.js';
+import { requireAuth } from './middlewares/authMiddleware.js';
 
 configDotenv();
 
@@ -32,10 +32,11 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 console.log("Statischer Pfad:", path.join(__dirname, 'public'));
-app.use("/user/*splat", sessionMiddleware);
+app.use("/user/profile", requireAuth);
 app.use("/api/firmware/*splat", requireRegisteredDevice);
 app.use("/api/*splat", requireRegisteredDeviceWithConfig);
 

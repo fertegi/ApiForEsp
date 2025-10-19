@@ -1,57 +1,59 @@
 import { getDatabase } from "../clients/mongoClient.js";
 import bcrypt from "bcryptjs";
-import { generateToken, invalidateToken } from "../middlewares/authMiddleware.js";
-
+import { invalidateToken, loginUser } from "../middlewares/authMiddleware.js";
+import cookieParser from 'cookie-parser';
 
 export function setupAuthRoutes(app) {
 
-
+    app.use(cookieParser());
     // GET für Anzeige des Loginformulars
     app.get("/user/login", (req, res) => {
-        if (req.session.user) {
-            return res.redirect('/user/profile');
+        const token = req.cookies?.auth_token;
+        if (token) {
+            try {
+                const decoded = jwt.verify(token, process.env.JWT_SECRET);
+                return res.redirect('/user/profile');
+            } catch (err) {
+                res.clearCookie('auth_token');
+            }
         }
+        const error = req.cookies.flash_error;
+        const success = req.cookies.flash_success;
+        // Cookies löschen
+        if (error) res.clearCookie('flash_error');
+        if (success) res.clearCookie('flash_success');
         res.render('auth/login', {
-            error: req.session.error,
-            success: req.session.success
+            error: error || req.query.error,
+            success: success || req.query.success
         });
-        // Session-Nachrichten löschen nach dem Anzeigen
-        delete req.session.error;
-        delete req.session.success;
     });
     // POST für Verarbeitung des Logins
     app.post("/user/login", async (req, res) => {
         try {
             const { username, password } = req.body;
             if (!username || !password) {
-                req.session.error = "Benutzername und Passwort sind erforderlich";
-                return res.redirect('/user/login');
+                res.cookie('flash_error', "Benutzername und Passwort sind erforderlich", {
+                    maxAge: 5000, // 5 Sekunden
+                    httpOnly: true
+                }); return res.redirect('/user/login');
             }
+            // Rest des Codes mit Cookie-Fehlermeldungen
 
             const database = await getDatabase();
             const usersCollection = database.collection("users");
             const user = await usersCollection.findOne({ username });
 
             if (!user) {
-                req.session.error = "Ungültige Anmeldedaten";
+                res.cookie('flash_error', "Ungültige Anmeldedaten", { maxAge: 5000, httpOnly: true });
                 return res.redirect('/user/login');
             }
-
             const passwordMatch = await bcrypt.compare(password, user.password);
             if (!passwordMatch) {
-                req.session.error = "Ungültige Anmeldedaten";
+                res.cookie('flash_error', "Ungültige Anmeldedaten", { maxAge: 5000, httpOnly: true });
                 return res.redirect('/user/login');
             }
 
-            // Erfolgreicher Login
-            const token = generateToken(user);
-
-            // Token in Session speichern
-            req.session.token = token;
-            req.session.user = {
-                username: user.username,
-                role: user.role
-            };
+            loginUser(res, user);
 
             // Je nach Rolle unterschiedliches Redirect
             if (user.role === 'admin') {
@@ -61,26 +63,23 @@ export function setupAuthRoutes(app) {
             }
         } catch (error) {
             console.error("Login-Fehler:", error);
-            req.session.error = "Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.";
-            res.redirect('/user/login');
+            res.cookie('flash_error', "Ein Fehler ist aufgetreten", { maxAge: 5000, httpOnly: true });
+            return res.redirect('/user/login');
         }
     });
 
     // Logout-Route
     app.get("/user/logout", (req, res) => {
         // Token invalidieren, falls vorhanden
-        if (req.session.token) {
-            invalidateToken(req.session.token).catch(err =>
+        const token = req.cookies?.auth_token;
+
+        if (token) {
+            invalidateToken(token).catch(err =>
                 console.error("Fehler beim Invalidieren des Tokens:", err));
+
+            res.clearCookie('auth_token');
         }
 
-        // Session zerstören
-        req.session.destroy(err => {
-            if (err) {
-                console.error("Fehler beim Logout:", err);
-            }
-            res.redirect('/user/login');
-        });
+        res.redirect('/user/login');
     });
-
 }

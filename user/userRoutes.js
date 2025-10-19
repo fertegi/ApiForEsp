@@ -6,7 +6,7 @@ export function setupUserRoutes(app) {
     });
 
     app.get("/user/profile", (req, res) => {
-        const user = req.session.user;
+        const user = req.user;
 
         if (!user) {
             return res.redirect('/user/login');
