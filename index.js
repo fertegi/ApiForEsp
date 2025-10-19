@@ -1,12 +1,21 @@
 import express from 'express';
-import { getOffersFromConfig } from './apps/marktguru.js';
-import { getAllDepartures } from './apps/bvg.js';
-import { fetchWeather } from './apps/weather.js';
-import { requireRegisteredDevice, requireRegisteredDeviceWithConfig } from "./configLoader.js"
+import { configDotenv } from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+import { isRedisHealthy } from './clients/redisClient.js';
+
+
+import { requireRegisteredDevice, requireRegisteredDeviceWithConfig } from "./middlewares/deviceMiddleware.js"
+import { sessionMiddleware } from './middlewares/sessionMiddleware.js';
+
+import { getOffersFromConfig } from './services/marktguru.js';
+import { getAllDepartures } from './services/bvg.js';
+import { fetchWeather } from './services/weather.js';
+
 import { setupUserRoutes } from "./user/userRoutes.js"
 import { setupFirmwareRoutes } from './firmware/firmwareRoutes.js';
-import { configDotenv } from 'dotenv';
-import { isRedisHealthy } from './clients/redisClient.js';
+import { setupAuthRoutes } from './user/authRoutes.js';
 
 configDotenv();
 
@@ -14,9 +23,30 @@ configDotenv();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// __dirname in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
+// View engine setup
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.use("/user/*splat", sessionMiddleware);
 app.use("/api/firmware/*splat", requireRegisteredDevice);
 app.use("/api/*splat", requireRegisteredDeviceWithConfig);
+
+setupUserRoutes(app);
+setupFirmwareRoutes(app);
+setupAuthRoutes(app);
+
+
+app.get("/", (req, res) => {
+    res.redirect("/user/login");
+});
 
 app.get("/api", (req, res) => {
     res.send("API is working");
@@ -117,8 +147,7 @@ app.get("/api/debug/cache", async (req, res) => {
     });
 });
 
-setupUserRoutes(app);
-setupFirmwareRoutes(app);
+
 
 app.listen(PORT, () => {
     console.log(`Server läuft auf Port ${PORT}`);
