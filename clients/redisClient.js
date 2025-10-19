@@ -29,10 +29,8 @@ export async function getCached(key) {
     try {
         const cached = await redis.get(key);
         if (cached) {
-            console.log(`Redis Cache Hit: ${key}`);
             return typeof cached === 'string' ? JSON.parse(cached) : cached;
         }
-        console.log(`Redis Cache Miss: ${key}`);
         return null;
     } catch (error) {
         console.error('Redis GET Fehler:', error);
@@ -47,7 +45,6 @@ export async function setCached(key, value, ttlSeconds = 300) {
     try {
         const serialized = typeof value === 'string' ? value : JSON.stringify(value);
         await redis.setex(key, ttlSeconds, serialized);
-        console.log(`Redis Cache Set: ${key} (TTL: ${ttlSeconds}s)`);
         return true;
     } catch (error) {
         console.error('Redis SET Fehler:', error);
@@ -61,7 +58,6 @@ export async function deleteCached(key) {
 
     try {
         await redis.del(key);
-        console.log(`Redis Cache Delete: ${key}`);
         return true;
     } catch (error) {
         console.error('Redis DELETE Fehler:', error);
