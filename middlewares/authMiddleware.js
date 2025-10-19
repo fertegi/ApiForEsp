@@ -44,7 +44,6 @@ export function requireAuth(req, res, next) {
                 }
                 return res.status(401).json({ error: "Token ist nicht mehr gültig" });
             }
-            console.log("Authentifizierung erfolgreich für Benutzer:", decoded);
             // User-Infos an Request anhängen
             req.user = {
                 username: decoded.username,
