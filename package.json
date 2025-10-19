@@ -13,8 +13,12 @@
   "description": "",
   "dependencies": {
     "@upstash/redis": "^1.35.4",
+    "bcryptjs": "^3.0.2",
+    "ejs": "^3.1.10",
     "express": "^5.1.0",
+    "express-session": "^1.18.2",
     "hafas-client": "^6.3.5",
+    "jsonwebtoken": "^9.0.2",
     "luxon": "^3.6.1",
     "mongodb": "^6.20.0",
     "node-cache": "^5.1.2"
