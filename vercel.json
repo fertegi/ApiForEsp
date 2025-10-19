@@ -22,6 +22,10 @@
         {
             "src": "/css/(.*)",
             "dest": "/public/css/$1"
+        },
+        {
+            "src": "/public/(.*)",
+            "dest": "/public/$1"
         }
     ]
 }
