@@ -113,12 +113,16 @@ async function cleanReleasesDir(dir) {
 
         const entries = await fs.readdir(dir, { withFileTypes: true });
 
+        let removedCount = 0;
         for (const entry of entries) {
-            const fullPath = path.join(dir, entry.name);
-            await fs.rm(fullPath, { recursive: true, force: true });
+            if (entry.isFile() && entry.name.endsWith('.bin')) {
+                const fullPath = path.join(dir, entry.name);
+                await fs.rm(fullPath, { force: true });
+                removedCount++;
+            }
         }
 
-        console.log(`Releases-Verzeichnis bereinigt: ${entries.length} Elemente entfernt`);
+        console.log(`Releases-Verzeichnis bereinigt: ${removedCount} .bin Dateien entfernt`);
     } catch (error) {
         if (error.code !== 'ENOENT') {
             console.warn(`Fehler beim Bereinigen von ${dir}:`, error.message);
