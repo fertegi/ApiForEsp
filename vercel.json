@@ -8,10 +8,6 @@
         {
             "src": "public/**",
             "use": "@vercel/static"
-        },
-        {
-            "src": "releases/**",
-            "use": "@vercel/static"
         }
     ],
     "routes": [

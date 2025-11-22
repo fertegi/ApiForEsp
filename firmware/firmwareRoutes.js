@@ -148,8 +148,6 @@ export function setupFirmwareRoutes(app) {
             const hashText = (await hashResponse.text()).trim().split(' ')[0];
 
             const filename = `${release.tag_name}.bin`;
-            console.log(process.cwd());
-            // const dir = path.resolve(process.cwd(), "releases");
             const localPath = path.join(releaseTempDir, filename);
 
             // Prüfe ob lokale Datei existiert und korrekt ist
@@ -160,7 +158,6 @@ export function setupFirmwareRoutes(app) {
                         return res.json({
                             version: release.tag_name,
                             url: binAsset.url,
-                            localPath,
                             sha256: hashText,
                             cached: true
                         });
@@ -179,7 +176,6 @@ export function setupFirmwareRoutes(app) {
             res.json({
                 version: release.tag_name,
                 url: binAsset.url,
-                localPath: downloadedPath,
                 sha256: hashText,
                 cached: false
             });
