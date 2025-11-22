@@ -150,6 +150,8 @@ export function setupFirmwareRoutes(app) {
             console.log(process.cwd());
             // const dir = path.resolve(process.cwd(), "releases");
             const dir = path.join(os.tmpdir(), "releases");
+            console.log(dir);
+
             const localPath = path.join(dir, filename);
 
             // Prüfe ob lokale Datei existiert und korrekt ist
