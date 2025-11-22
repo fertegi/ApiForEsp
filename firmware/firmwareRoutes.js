@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import crypto from 'crypto'; // neu: für SHA256-Prüfung
-
+import os from 'os';
 
 const owner = process.env.FW_REPO_OWNER || "fertegi";
 const repo = process.env.FW_REPO_NAME || "ESP32_YourWatcher";
@@ -148,7 +148,8 @@ export function setupFirmwareRoutes(app) {
 
             const filename = `${release.tag_name}.bin`;
             console.log(process.cwd());
-            const dir = path.resolve(process.cwd(), "releases");
+            // const dir = path.resolve(process.cwd(), "releases");
+            const dir = path.join(os.tmpdir(), "releases");
             const localPath = path.join(dir, filename);
 
             // Prüfe ob lokale Datei existiert und korrekt ist
