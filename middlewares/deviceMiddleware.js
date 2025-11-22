@@ -40,11 +40,6 @@ export async function isDeviceRegistered(deviceId) {
         return cachedResult;
     }
 
-    // 2. Request-lokaler Cache check (Fallback)
-    if (requestCache.has(cacheKey)) {
-        return requestCache.get(cacheKey);
-    }
-
     try {
         const database = await getDatabase();
         const deviceConfigurations = database.collection("deviceConfigurations");

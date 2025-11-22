@@ -37,6 +37,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 console.log("Statischer Pfad:", path.join(__dirname, 'public'));
 app.use("/user/profile", requireAuth);
+app.use("/user/offers", requireAuth);
 app.use("/api/firmware/*splat", requireRegisteredDevice);
 app.use("/api/*splat", requireRegisteredDeviceWithConfig);
 

@@ -19,7 +19,6 @@ export async function invalidateDeviceCache(deviceId) {
     requestCache.delete(deviceId);
     requestCache.delete(`exists_${deviceId}`);
 
-    console.log(`Cache invalidiert für Device: ${deviceId}`);
 }
 
 export async function loadConfig(deviceId) {
@@ -28,13 +27,11 @@ export async function loadConfig(deviceId) {
     // 1. Redis Cache check
     const cachedConfig = await getCached(cacheKey);
     if (cachedConfig) {
-        console.log("Redis-cached config used for deviceId:", deviceId);
         return cachedConfig;
     }
 
     // 2. Request-lokaler Cache check (Fallback)
     if (requestCache.has(deviceId)) {
-        console.log(" Request-cached config used for deviceId:", deviceId);
         return requestCache.get(deviceId);
     }
 

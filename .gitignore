@@ -28,6 +28,6 @@ Thumbs.db
 .vercel
 
 
-releases
+*.bin
 
 _scripts

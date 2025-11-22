@@ -32,11 +32,9 @@ export function withCache(fn, options = {}) {
             // 1. Versuche aus Cache zu laden
             const cachedResult = await getCached(cacheKey);
             if (cachedResult !== null) {
-                console.log(`Cache Hit: ${cacheKey}`);
                 return cachedResult;
             }
 
-            console.log(`Cache Miss: ${cacheKey}`);
 
             // 2. Führe ursprüngliche Funktion aus
             const result = await fn.apply(this, args);
@@ -44,13 +42,12 @@ export function withCache(fn, options = {}) {
             // 3. Speichere Ergebnis im Cache (nur bei erfolgreichem Ergebnis)
             if (result !== null && result !== undefined) {
                 await setCached(cacheKey, result, ttl);
-                console.log(`Cache Set: ${cacheKey} (TTL: ${ttl}s)`);
             }
 
             return result;
 
         } catch (error) {
-            console.error(`Cache-Wrapper Fehler für ${cacheKey}:`, error);
+            console.error(`Cache-Wrapper Fehler für:`, error);
             // Bei Cache-Fehlern trotzdem die ursprüngliche Funktion ausführen
             return await fn.apply(this, args);
         }
