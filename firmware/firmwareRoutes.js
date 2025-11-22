@@ -6,6 +6,8 @@ import os from 'os';
 const owner = process.env.FW_REPO_OWNER || "fertegi";
 const repo = process.env.FW_REPO_NAME || "ESP32_YourWatcher";
 
+const releaseTempDir = path.join(os.tmpdir(), "releases");
+
 function validateGitHubToken() {
     if (!process.env.GITHUB_TOKEN) {
         throw new Error("GITHUB_TOKEN nicht gesetzt");
@@ -81,12 +83,11 @@ async function downloadFirmware(url, filename = "firmware.bin") {
     }
 
     // Stelle sicher, dass das Zielverzeichnis existiert
-    const dir = path.resolve(process.cwd(), "releases");
-    await fs.mkdir(dir, { recursive: true });
+    await fs.mkdir(releaseTempDir, { recursive: true });
 
     // Buffer erhalten und als Datei schreiben
     const buffer = Buffer.from(await response.arrayBuffer());
-    const outPath = path.join(dir, filename);
+    const outPath = path.join(releaseTempDir, filename);
     await fs.writeFile(outPath, buffer);
 
     return outPath;
@@ -149,10 +150,7 @@ export function setupFirmwareRoutes(app) {
             const filename = `${release.tag_name}.bin`;
             console.log(process.cwd());
             // const dir = path.resolve(process.cwd(), "releases");
-            const dir = path.join(os.tmpdir(), "releases");
-            console.log(dir);
-
-            const localPath = path.join(dir, filename);
+            const localPath = path.join(releaseTempDir, filename);
 
             // Prüfe ob lokale Datei existiert und korrekt ist
             if (await fileExists(localPath)) {
@@ -173,8 +171,8 @@ export function setupFirmwareRoutes(app) {
             }
 
             // Download erforderlich: Verzeichnis bereinigen und neue Datei laden
-            await fs.mkdir(dir, { recursive: true });
-            await cleanReleasesDir(dir);
+            await fs.mkdir(releaseTempDir, { recursive: true });
+            await cleanReleasesDir(releaseTempDir);
 
             const downloadedPath = await downloadFirmware(binAsset.url, filename);
 
