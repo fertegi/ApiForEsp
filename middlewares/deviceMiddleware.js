@@ -40,6 +40,7 @@ export async function isDeviceRegistered(deviceId) {
         return cachedResult;
     }
 
+
     try {
         const database = await getDatabase();
         const deviceConfigurations = database.collection("deviceConfigurations");
@@ -49,7 +50,6 @@ export async function isDeviceRegistered(deviceId) {
 
         // In beiden Caches speichern
         await setCached(cacheKey, result, 300); // 5 Minuten Redis Cache
-        requestCache.set(cacheKey, result);
 
         return result;
     } catch (error) {

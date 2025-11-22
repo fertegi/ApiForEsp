@@ -147,6 +147,7 @@ export function setupFirmwareRoutes(app) {
             const hashText = (await hashResponse.text()).trim().split(' ')[0];
 
             const filename = `${release.tag_name}.bin`;
+            console.log(process.cwd());
             const dir = path.resolve(process.cwd(), "releases");
             const localPath = path.join(dir, filename);
 
