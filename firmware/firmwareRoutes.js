@@ -147,6 +147,10 @@ export function setupFirmwareRoutes(app) {
                     message: response.statusText
                 });
             };
+            const contentLengtgh = response.headers.get('content-length');
+            if (contentLengtgh) {
+                res.setHeader('Content-Length', contentLengtgh);
+            }
             res.setHeader('Content-Type', 'application/octet-stream');
             res.setHeader('Content-Disposition', 'attachment; filename="firmware.bin"');
             response.body.pipe(res);
