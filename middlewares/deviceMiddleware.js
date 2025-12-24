@@ -1,5 +1,5 @@
 
-import { getCached, setCached } from "../clients/redisClient.js";
+import { getCached, setCached } from "../clients/cacheClient.js";
 import { getDatabase } from "../clients/mongoClient.js";
 import { loadConfig } from "../configLoader.js";
 

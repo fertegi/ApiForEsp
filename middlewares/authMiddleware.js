@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { getCached, setCached } from "../clients/redisClient.js";
+import { getCached, setCached } from "../clients/cacheClient.js";
 
 const JWT_SECRET = process.env.JWT_SECRET || "unsafe_jwt_secret";
 const TTL_TOKEN_CACHE = 3600; // 1 Stunde Cache für die Token-Blacklist
