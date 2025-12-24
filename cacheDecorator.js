@@ -1,4 +1,14 @@
-import { getCached, setCached } from "./clients/redisClient.js";
+import { getCached, setCached } from "./clients/cacheClient.js";
+import crypto from 'crypto';
+
+/**
+ * Generiert einen kurzen Hash aus einem String
+ * @param {string} str - Input string
+ * @returns {string} - 12-stelliger Hash
+ */
+function shortHash(str) {
+    return crypto.createHash('sha256').update(str).digest('hex').substring(0, 12);
+}
 
 /**
  * Cache-Decorator für Funktionen - funktioniert wie Python-Decorators
@@ -12,7 +22,7 @@ import { getCached, setCached } from "./clients/redisClient.js";
  */
 export function withCache(fn, options = {}) {
     const {
-        keyGenerator = (...args) => `${fn.name}_${JSON.stringify(args)}`,
+        keyGenerator = (...args) => shortHash(JSON.stringify(args)),
         ttl = 300, // 5 Minuten Standard
         prefix = 'cache',
         skipCache = false
@@ -56,12 +66,16 @@ export function withCache(fn, options = {}) {
 
 /**
  * Einfacher Cache-Decorator mit Standard-Einstellungen
+ * Nutzt Hash des Funktionsnamens + Argumente als Key
  * @param {number} ttl - TTL in Sekunden
  * @returns {Function} - Decorator-Funktion
  */
 export function cached(ttl = 300) {
     return function decorator(fn) {
-        return withCache(fn, { ttl });
+        return withCache(fn, { 
+            ttl,
+            keyGenerator: (...args) => `${fn.name}:${shortHash(JSON.stringify(args))}`
+        });
     };
 }
 
@@ -76,12 +90,28 @@ export function apiCached(ttl = 600, prefix = 'api') {
         return withCache(fn, {
             ttl,
             prefix,
+            keyGenerator: (...args) => `${fn.name}:${shortHash(JSON.stringify(args))}`
+        });
+    };
+}
+
+/**
+ * Cache-Decorator für Device-spezifische Funktionen
+ * Nutzt deviceId aus Config für lesbaren Cache-Key
+ * @param {number} ttl - TTL in Sekunden
+ * @returns {Function} - Decorator-Funktion
+ */
+export function deviceCached(ttl = 600) {
+    return function decorator(fn) {
+        return withCache(fn, {
+            ttl,
+            prefix: 'device',
             keyGenerator: (...args) => {
-                // Bessere Key-Generierung für API-Calls
-                const cleanArgs = args.map(arg =>
-                    typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
-                ).join('_');
-                return `${fn.name}_${cleanArgs}`.replace(/[^a-zA-Z0-9_-]/g, '_');
+                // Versuche deviceId aus dem ersten Argument (Config) zu extrahieren
+                const config = args[0];
+                const deviceId = config?.deviceId || config?._id || 'unknown';
+                const argsHash = shortHash(JSON.stringify(args));
+                return `${fn.name}:${deviceId}:${argsHash}`;
             }
         });
     };

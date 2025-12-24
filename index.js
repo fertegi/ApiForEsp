@@ -3,7 +3,7 @@ import { configDotenv } from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import { isRedisHealthy } from './clients/redisClient.js';
+import { isCacheHealthy, initCacheCollection } from './clients/cacheClient.js';
 import cookieParser from 'cookie-parser';
 
 import { requireRegisteredDevice, requireRegisteredDeviceWithConfig } from "./middlewares/deviceMiddleware.js"
@@ -133,13 +133,14 @@ app.get('/api/weather', async (req, res) => {
 
 // ...existing code...
 
-app.get("/api/debug/cache", async (req, res) => {
-    const redisHealthy = await isRedisHealthy();
+// Debug-Endpoint außerhalb der Device-Middleware (kein /api/ Prefix)
+app.get("/debug/cache", async (req, res) => {
+    const cacheHealthy = await isCacheHealthy();
 
     res.json({
-        redis: {
-            healthy: redisHealthy,
-            enabled: !!process.env.UPSTASH_REDIS_REST_URL
+        cache: {
+            healthy: cacheHealthy,
+            type: 'mongodb'
         },
         timestamp: new Date().toISOString(),
         process: {
@@ -151,6 +152,9 @@ app.get("/api/debug/cache", async (req, res) => {
 
 
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
     console.log(`Server läuft auf Port ${PORT}`);
+    
+    // MongoDB Cache Collection initialisieren (TTL-Index erstellen)
+    await initCacheCollection();
 });

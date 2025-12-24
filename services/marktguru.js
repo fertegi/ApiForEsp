@@ -1,5 +1,5 @@
 import { apiUrls } from "../apiUrls.js";
-import { cached } from '../cacheDecorator.js';
+import { deviceCached } from '../cacheDecorator.js';
 const re = /<script\stype="application\/json">([\s\S]*?)<\/script>/g;
 
 
@@ -162,4 +162,4 @@ async function _getOffersFromConfig(config) {
 }
 
 const TTL_OFFERS = 6000; // 100 minutes
-export const getOffersFromConfig = cached(TTL_OFFERS)(_getOffersFromConfig);
+export const getOffersFromConfig = deviceCached(TTL_OFFERS)(_getOffersFromConfig);
