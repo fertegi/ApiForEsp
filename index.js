@@ -10,7 +10,7 @@ import { requireRegisteredDevice, requireRegisteredDeviceWithConfig } from "./mi
 
 import { getOffersFromConfig } from './services/marktguru.js';
 import { getAllDepartures } from './services/bvg.js';
-import { fetchWeather } from './services/weather.js';
+import { getWeatherData } from './services/weather.js';
 
 import { setupUserRoutes } from "./user/userRoutes.js"
 import { setupFirmwareRoutes } from './firmware/firmwareRoutes.js';
@@ -116,14 +116,9 @@ app.get('/api/weather', async (req, res) => {
             return res.status(500).json(config);
         }
 
-        const { location = {} } = config;
-        const { latitude, longitude } = location;
-
-        if (!latitude || !longitude) {
-            return res.status(400).json({ error: 'Standortkoordinaten fehlen in der Konfiguration.' });
-        }
-        const weatherData = await fetchWeather(latitude, longitude);
-        res.json(weatherData);
+        const nextWeatherData = await getWeatherData(config);
+        console.log("Wetterdaten abgerufen:", nextWeatherData);
+        res.json(nextWeatherData);
     } catch (error) {
         console.error('Fehler beim Abrufen der Wetterdaten:', error);
         res.status(500).json({ error: 'Fehler beim Abrufen der Wetterdaten.' });
@@ -154,7 +149,7 @@ app.get("/debug/cache", async (req, res) => {
 
 app.listen(PORT, async () => {
     console.log(`Server läuft auf Port ${PORT}`);
-    
+
     // MongoDB Cache Collection initialisieren (TTL-Index erstellen)
     await initCacheCollection();
 });
