@@ -18,9 +18,9 @@ export function requireAuth(req, res, next) {
 
         if (!token) {
             // Bei Web-Zugriffen zum Login umleiten
-            // if (req.headers.accept?.includes('text/html')) {
-            return res.redirect('/user/login');
-            // }
+            if (req.headers.accept?.includes('text/html')) {
+                return res.redirect('/user/login');
+            }
             // Bei API-Zugriffen 401 zurückgeben
             return res.status(401).json({ error: "Nicht authentifiziert" });
         }
@@ -48,7 +48,6 @@ export function requireAuth(req, res, next) {
             req.user = {
                 username: decoded.username,
                 role: decoded.role,
-                // userId: decoded.
             };
 
             // User-Info auch für Templates bereitstellen

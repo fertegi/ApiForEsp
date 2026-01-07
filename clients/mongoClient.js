@@ -44,7 +44,6 @@ class MongoDBConnection {
                 console.warn('Fehler beim Schließen der alten Verbindung:', error);
             }
         }
-
         // Neue Verbindung für Vercel optimiert
         this.client = new MongoClient(apiUrls.mongoDBUri, {
             serverApi: {
@@ -120,6 +119,17 @@ export async function getAllDevices() {
         .find({}, { projection: { deviceId: 1, _id: 0 } })
         .toArray();
     return devices;
+}
+
+
+export async function getDeviceConfiguaration(deviceId) {
+    const db = await getDatabase();
+    const deviceConfigurations = db.collection("deviceConfigurations");
+    const config = await deviceConfigurations.findOne({
+        deviceId:
+            deviceId
+    });
+    return config;
 }
 
 // Graceful Shutdown für Vercel

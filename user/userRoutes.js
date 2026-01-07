@@ -1,5 +1,5 @@
 import { getOffersFromConfig } from "../services/marktguru.js";
-import { getDatabase } from "../clients/mongoClient.js";
+import { getDatabase, getDeviceConfiguaration } from "../clients/mongoClient.js";
 
 
 export function setupUserRoutes(app) {
@@ -21,36 +21,25 @@ export function setupUserRoutes(app) {
         });
     });
 
-    app.get("/user/offers", async (req, res) => {
-        try {
-            const user = req.user;
-            if (!user) {
-                return res.redirect('/user/login');
-            }
+    app.get("/user/deviceConfiguration", async (req, res) => {
+        const user = req.user;
+        console.log(user);
+        const deviceConfigurations = user.belongs.map(async (deviceId) => {
+            const config = await getDeviceConfiguaration(deviceId);
+            return {
+                deviceId,
+                config
+            };
+        });
+        const configurations = await Promise.all(deviceConfigurations);
+        console.log("Device Configurations:", configurations);
 
-            const database = await getDatabase();
-            const usersCollection = database.collection("users");
-            const deviceCollection = database.collection("deviceConfigurations");
-            const userDB = await usersCollection.findOne({ id: user.id });
-
-            if (!userDB) {
-                return res.redirect('/user/login');
-            }
-
-            // Annahme: Ein Benutzer ist mit genau einem Gerät verbunden
-            const deviceId = userDB.belongs[0] || {};
-            const deviceConfig = await deviceCollection.findOne({ _id: deviceId });
-            if (!deviceConfig) {
-                return res.status(500).json({ error: 'Gerätekonfiguration nicht gefunden.' });
-            }
-            const offers = await getOffersFromConfig(deviceConfig);
-            if (!offers || offers.length === 0) {
-                return res.status(404).json({ message: 'Keine Angebote in der Konfiguration gefunden.' });
-            }
-            res.json(offers);
-        } catch (error) {
-            console.error('Fehler beim Abrufen der Ergebnisse:', error);
-            res.status(500).json({ error: 'Fehler beim Abrufen der Ergebnisse.' });
+        if (!user) {
+            return res.redirect('/user/login');
         }
+        return res.render("users/deviceConfiguration", {
+            user: user
+        });
     });
+
 }

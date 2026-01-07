@@ -1,5 +1,7 @@
-import express from 'express';
 import { configDotenv } from 'dotenv';
+const res = configDotenv();
+
+import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -17,7 +19,6 @@ import { setupFirmwareRoutes } from './firmware/firmwareRoutes.js';
 import { setupAuthRoutes } from './user/authRoutes.js';
 import { requireAuth } from './middlewares/authMiddleware.js';
 
-configDotenv();
 
 
 const app = express();
@@ -37,6 +38,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 console.log("Statischer Pfad:", path.join(__dirname, 'public'));
 app.use("/user/profile", requireAuth);
+app.use("/user/deviceConfiguration", requireAuth);
 app.use("/user/offers", requireAuth);
 app.use("/api/firmware/*splat", requireRegisteredDevice);
 app.use("/api/*splat", requireRegisteredDeviceWithConfig);
@@ -117,7 +119,6 @@ app.get('/api/weather', async (req, res) => {
         }
 
         const nextWeatherData = await getWeatherData(config);
-        console.log("Wetterdaten abgerufen:", nextWeatherData);
         res.json(nextWeatherData);
     } catch (error) {
         console.error('Fehler beim Abrufen der Wetterdaten:', error);

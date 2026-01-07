@@ -1,5 +1,9 @@
+import { configDotenv } from 'dotenv';
+
+configDotenv();
+
 export const apiUrls = {
-    mongoDBUri: "mongodb+srv://admin:YKfELCixHXXyYRTR@cluster0.oy8azgp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+    mongoDBUri: process.env.MONGODB_URI || null,
     weatherApiUrl: (lat, lon, options = {}) => {
         const params = new URLSearchParams({
             latitude: lat,
