@@ -132,7 +132,7 @@ export function enrichWeatherData(weatherData) {
         return {
             ...data,
             windSpeedKnoten,
-            "isBikeWeather":bikeWeather,
+            "isBikeWeather": bikeWeather,
         }
     });
 }
