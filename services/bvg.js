@@ -5,24 +5,30 @@ import { profile as bvgProfile } from 'hafas-client/p/bvg/index.js'
 
 export async function fetchDepartures(stopId, duration = 10) {
     const userAgent = "bumaye@zoho.eu"
-    const client = createClient(bvgProfile, userAgent)
-    const res = await client.departures(stopId, { when: new Date(), duration: duration })
-
-    return res.departures || [];
+    // const client = createClient(bvgProfile, userAgent)
+    // const res = await client.departures(stopId, { when: new Date(), duration: duration })
+    const res = await fetch(`https://v6.vbb.transport.rest/stops/${stopId}/departures?duration=${duration}`)
+    const data = await res.json();
+    return data.departures || [];
 }
 
+
+//  Hilfsfunktionen
+// Die Funktion überprüft, ob die Abfahrtslinie in den Benutzereinstellungen enthalten ist
+// userLines ist ein Array von Objekten mit möglichen Eigenschaften 'id' und 'name'
 function isLineAllowed(departure, userLines) {
     if (!userLines || userLines.length === 0) return true;
 
     const lineInfo = departure.line || {};
-    const lineId = lineInfo.id || '';
+    // const lineId = lineInfo.id || '';
     const name = lineInfo.name || 'No Name';
 
     return userLines.some(ul =>
-        (ul.id && ul.id === lineId) || (ul.name && ul.name === name)
+        ul === name
     );
 }
 
+// Die Funktion erstellt einen Eintrag für eine Abfahrt
 function createDepartureEntry(departure) {
     const lineInfo = departure.line || {};
     const name = lineInfo.name || 'No Name';
@@ -102,15 +108,14 @@ export function postprocessData(data) {
     });
 }
 
-export async function getAllDepartures(stops) {
+export async function getAllDepartures(stops, userLines) {
     const data = [];
     const locs = stops || [];
     if (!locs.length) {
-        console.log('No locations found in config.json');
+        console.log('No locations found in config');
         return data;
     }
     for (const loc of locs) {
-        const userLines = loc.lines || [];
         const stopId = loc.id;
         if (!stopId) {
             console.log(`StopID missing for location: ${JSON.stringify(loc)} `);
@@ -122,6 +127,7 @@ export async function getAllDepartures(stops) {
         } catch (e) {
             console.log(`Error fetching departures for stop ${stopId}: ${e} `);
         }
+
         if (departures && departures.length) {
             const finalList = groupDepartures(departures, userLines);
             data.push(...finalList);
@@ -136,3 +142,5 @@ export async function getAllDepartures(stops) {
 
     return postprocessedData.length ? postprocessedData : [];
 }
+
+

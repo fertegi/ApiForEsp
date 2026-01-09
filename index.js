@@ -96,7 +96,8 @@ app.get("/api/departures", async (req, res) => {
         }
 
         const stops = config.departures.stops || [];
-        const departures = await getAllDepartures(stops);
+        const userLines = config.departures.userLines || [];
+        const departures = await getAllDepartures(stops, userLines);
         if (!departures || departures.length === 0) {
             return res.status(404).json({ message: 'Keine Abfahrten gefunden.' });
         }
