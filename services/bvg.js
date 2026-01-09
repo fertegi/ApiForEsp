@@ -1,12 +1,8 @@
 import { parseTime, deltaFromNow } from "../util_time.js";
-import { createClient } from 'hafas-client'
-import { profile as bvgProfile } from 'hafas-client/p/bvg/index.js'
+import { deviceCached } from "../cacheDecorator.js";
 
 
 export async function fetchDepartures(stopId, duration = 10) {
-    const userAgent = "bumaye@zoho.eu"
-    // const client = createClient(bvgProfile, userAgent)
-    // const res = await client.departures(stopId, { when: new Date(), duration: duration })
     const res = await fetch(`https://v6.vbb.transport.rest/stops/${stopId}/departures?duration=${duration}`)
     const data = await res.json();
     return data.departures || [];
@@ -108,7 +104,7 @@ export function postprocessData(data) {
     });
 }
 
-export async function getAllDepartures(stops, userLines) {
+export async function _getAllDepartures(stops, userLines) {
     const data = [];
     const locs = stops || [];
     if (!locs.length) {
@@ -142,5 +138,7 @@ export async function getAllDepartures(stops, userLines) {
 
     return postprocessedData.length ? postprocessedData : [];
 }
+const TTL_DEPARTURES = 20; // 20 Sekunden
+export const getAllDepartures = deviceCached(TTL_DEPARTURES)(_getAllDepartures);
 
 
