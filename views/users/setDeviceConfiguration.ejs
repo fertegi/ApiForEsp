@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geräte-Konfiguration - <%= user.username %>
+    </title>
+    <link rel="stylesheet" href="/css/global.css">
+    <style>
+        .container {
+            max-width: 600px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Geräte-Konfiguration</h1>
+        <p>Hallo <%= user.username %>! Hier kannst du deinen YourWatcher konfigurieren.</p>
+
+        <% if (flash) { %>
+            <div class="flash-message flash-<%= flash.type %>">
+                <%= flash.message %>
+            </div>
+            <% } %>
+
+                <div class="config-form-container">
+                    <form method="POST" action="/user/setDeviceConfiguration" id="configForm">
+
+                        <!-- Geräte-Auswahl -->
+                        <div class="form-section">
+                            <h3>📱 Gerät auswählen</h3>
+                            <div class="form-group">
+                                <label for="deviceSelect">Gerät:</label>
+                                <select name="deviceId" id="deviceSelect" onchange="loadConfig(this.value)">
+                                    <% configurations.forEach(function(item, index) { %>
+                                        <option value="<%= item.deviceId %>" <%=index===0 ? 'selected' : '' %>>
+                                            <%= item.deviceId %>
+                                        </option>
+                                        <% }); %>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Standort -->
+                        <div class="form-section">
+                            <h3>📍 Standort</h3>
+                            <div class="form-group">
+                                <label for="zipCode">Postleitzahl:</label>
+                                <input type="text" name="zipCode" id="zipCode" maxlength="5" pattern="[0-9]{5}"
+                                    placeholder="z.B. 10249">
+                                <small id="zipCodeStatus" class="field-status"></small>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="latitude">Breitengrad:</label>
+                                    <input type="number" name="latitude" id="latitude" step="0.001" min="-90" max="90"
+                                        placeholder="wird automatisch ermittelt" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label for="longitude">Längengrad:</label>
+                                    <input type="number" name="longitude" id="longitude" step="0.001" min="-180"
+                                        max="180" placeholder="wird automatisch ermittelt" readonly>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Wetter -->
+                        <div class="form-section">
+                            <h3>🌤️ Wetter</h3>
+                            <div class="form-group">
+                                <label for="hourThreshold">Stunden-Schwellwert:</label>
+                                <input type="number" name="hourThreshold" id="hourThreshold" min="0" max="24"
+                                    placeholder="z.B. 20">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="hour1">Vorhersage 1 (Uhr):</label>
+                                    <input type="number" name="hour1" id="hour1" min="0" max="23" placeholder="z.B. 9">
+                                </div>
+                                <div class="form-group">
+                                    <label for="hour2">Vorhersage 2 (Uhr):</label>
+                                    <input type="number" name="hour2" id="hour2" min="0" max="23" placeholder="z.B. 11">
+                                </div>
+                                <div class="form-group">
+                                    <label for="hour3">Vorhersage 3 (Uhr):</label>
+                                    <input type="number" name="hour3" id="hour3" min="0" max="23" placeholder="z.B. 19">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Intervalle -->
+                        <div class="form-section">
+                            <h3>⏱️ Aktualisierungs-Intervalle (ms)</h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="intervalWeather">Wetter:</label>
+                                    <input type="number" name="intervalWeather" id="intervalWeather" min="1000"
+                                        step="1000" placeholder="z.B. 6000000">
+                                </div>
+                                <div class="form-group">
+                                    <label for="intervalOffers">Angebote:</label>
+                                    <input type="number" name="intervalOffers" id="intervalOffers" min="1000"
+                                        step="1000" placeholder="z.B. 60000000">
+                                </div>
+                                <div class="form-group">
+                                    <label for="intervalDepartures">Abfahrten:</label>
+                                    <input type="number" name="intervalDepartures" id="intervalDepartures" min="1000"
+                                        step="1000" placeholder="z.B. 30000">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Features -->
+                        <div class="form-section">
+                            <h3>✨ Aktivierte Features</h3>
+                            <div class="checkbox-group">
+                                <input type="checkbox" name="featureWeather" id="featureWeather">
+                                <label for="featureWeather">Wetter anzeigen</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" name="featureOffers" id="featureOffers">
+                                <label for="featureOffers">Angebote anzeigen</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" name="featureDepartures" id="featureDepartures">
+                                <label for="featureDepartures">Abfahrten anzeigen</label>
+                            </div>
+                        </div>
+
+                        <div class="button-group">
+                            <button type="submit" class="btn btn-primary">💾 Speichern</button>
+                            <a href="/user/profile" class="btn btn-secondary">Zurück</a>
+                        </div>
+                    </form>
+                </div>
+
+                <div style="margin-top: 1.5rem; text-align: center;">
+                    <a href="/user/logout" class="btn btn-danger">Abmelden</a>
+                </div>
+    </div>
+
+    <script>
+        // Konfigurationen als JavaScript-Objekt
+        const configurations = JSON.parse('<%= JSON.stringify(configurations) %>');
+
+        function loadConfig(deviceId) {
+            const config = configurations.find(c => c.deviceId === deviceId);
+            if (!config || !config.config) return;
+
+            const cfg = config.config;
+
+            // Location
+            document.getElementById('zipCode').value = cfg.location?.zipCode || '';
+            document.getElementById('latitude').value = cfg.location?.latitude || '';
+            document.getElementById('longitude').value = cfg.location?.longitude || '';
+
+            // Weather
+            document.getElementById('hourThreshold').value = cfg.weather?.hourThreshold || '';
+            const hours = cfg.weather?.hoursToForecast || [];
+            document.getElementById('hour1').value = hours[0] ?? '';
+            document.getElementById('hour2').value = hours[1] ?? '';
+            document.getElementById('hour3').value = hours[2] ?? '';
+
+            // Intervals
+            const intervals = cfg.deviceConfiguration?.intervals || {};
+            document.getElementById('intervalWeather').value = intervals.weather || '';
+            document.getElementById('intervalOffers').value = intervals.offers || '';
+            document.getElementById('intervalDepartures').value = intervals.departures || '';
+
+            // Features
+            const features = cfg.deviceConfiguration?.features || {};
+            document.getElementById('featureWeather').checked = features.weather || false;
+            document.getElementById('featureOffers').checked = features.offers || false;
+            document.getElementById('featureDepartures').checked = features.departures || false;
+        }
+
+        // PLZ-Lookup für automatische Koordinaten
+        async function lookupZipCode(zipCode) {
+            const statusEl = document.getElementById('zipCodeStatus');
+            const latEl = document.getElementById('latitude');
+            const lngEl = document.getElementById('longitude');
+
+            if (!zipCode || zipCode.length !== 5) {
+                statusEl.textContent = '';
+                statusEl.className = 'field-status';
+                return;
+            }
+
+            try {
+                statusEl.textContent = 'Suche...';
+                statusEl.className = 'field-status';
+
+                const response = await fetch(`/api/zipcode/${zipCode}`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    latEl.value = data.latitude;
+                    lngEl.value = data.longitude;
+                    statusEl.textContent = '✓ Koordinaten gefunden';
+                    statusEl.className = 'field-status field-status-success';
+                } else {
+                    latEl.value = '';
+                    lngEl.value = '';
+                    statusEl.textContent = '✗ PLZ nicht gefunden';
+                    statusEl.className = 'field-status field-status-error';
+                }
+            } catch (error) {
+                console.error('PLZ-Lookup Fehler:', error);
+                statusEl.textContent = '✗ Fehler bei der Abfrage';
+                statusEl.className = 'field-status field-status-error';
+            }
+        }
+
+        // Event Listener für PLZ-Eingabe
+        document.getElementById('zipCode').addEventListener('input', function (e) {
+            const zipCode = e.target.value.replace(/\D/g, ''); // Nur Zahlen
+            e.target.value = zipCode;
+
+            if (zipCode.length === 5) {
+                lookupZipCode(zipCode);
+            }
+        });
+
+        // Beim Laden die erste Konfiguration anzeigen
+        document.addEventListener('DOMContentLoaded', function () {
+            if (configurations.length > 0) {
+                loadConfig(configurations[0].deviceId);
+            }
+        });
+    </script>
+</body>
+
+</html>

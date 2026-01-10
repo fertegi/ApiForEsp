@@ -146,3 +146,194 @@ p {
     border-radius: 4px;
     font-weight: 500;
 }
+
+/* Button Styles */
+.btn {
+    display: inline-block;
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    text-decoration: none;
+    text-align: center;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn-primary {
+    background: var(--btn-color);
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: var(--dark-color);
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: #fff;
+}
+
+.btn-secondary:hover {
+    background: #545b62;
+}
+
+.btn-danger {
+    background: var(--danger-color);
+    color: #fff;
+}
+
+.btn-danger:hover {
+    background: #d32f2f;
+}
+
+/* Select Styles */
+select {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    background-color: #fff;
+    cursor: pointer;
+    transition: border 0.3s;
+}
+
+select:focus {
+    border-color: var(--btn-color);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.25);
+}
+
+/* Number Input Styles */
+input[type="number"] {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border 0.3s;
+}
+
+input[type="number"]:focus {
+    border-color: var(--btn-color);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.25);
+}
+
+/* Checkbox/Toggle Styles */
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.8rem;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--btn-color);
+}
+
+.checkbox-group label {
+    color: var(--text-color);
+    cursor: pointer;
+    margin: 0;
+}
+
+/* Form Section Styles */
+.form-section {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(180, 33, 243, 0.3);
+    border-radius: 8px;
+    padding: 1.2rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-section h3 {
+    color: var(--border-color);
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    border-bottom: 1px solid rgba(180, 33, 243, 0.3);
+    padding-bottom: 0.5rem;
+}
+
+.form-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.form-row .form-group {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+/* Flash Messages */
+.flash-message {
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.flash-success {
+    background-color: rgba(76, 175, 80, 0.2);
+    color: var(--success-color);
+    border: 1px solid var(--success-color);
+}
+
+.flash-error {
+    background-color: rgba(244, 67, 54, 0.2);
+    color: var(--danger-color);
+    border: 1px solid var(--danger-color);
+}
+
+/* Config Form Container */
+.config-form-container {
+    max-width: 100%;
+}
+
+.config-form-container .form-group input,
+.config-form-container .form-group select {
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+/* Button Group */
+.button-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.button-group .btn {
+    flex: 1;
+}
+
+/* Field Status (für PLZ-Lookup etc.) */
+.field-status {
+    display: block;
+    font-size: 0.85rem;
+    margin-top: 0.3rem;
+    min-height: 1.2em;
+}
+
+.field-status-success {
+    color: var(--success-color);
+}
+
+.field-status-error {
+    color: var(--danger-color);
+}
+
+/* Readonly Inputs */
+input[readonly] {
+    background-color: rgba(200, 200, 200, 0.3) !important;
+    cursor: not-allowed;
+    color: #666;
+}

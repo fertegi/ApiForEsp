@@ -21,5 +21,8 @@ export const apiUrls = {
     marktGuruApiUrl: "https://api.marktguru.de/api/v1",
     marktGuruSearchUrl: function (params) {
         return `${this.marktGuruApiUrl}/offers/search/?${params.toString()}`
+    },
+    quoteOfTheDayApiUrl: (options = {}) => {
+        return "https://zenquotes.io/?api=random";
     }
 }

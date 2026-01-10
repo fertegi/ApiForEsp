@@ -13,10 +13,11 @@ import { requireRegisteredDevice, requireRegisteredDeviceWithConfig } from "./mi
 import { getOffersFromConfig } from './services/marktguru.js';
 import { getAllDepartures } from './services/bvg.js';
 import { getWeatherData } from './services/weather.js';
-
+import { getQuoteOfTheDay } from './services/quoteOfTheDay.js';
 import { setupUserRoutes } from "./user/userRoutes.js"
 import { setupFirmwareRoutes } from './firmware/firmwareRoutes.js';
 import { setupAuthRoutes } from './user/authRoutes.js';
+import { setupZipCodeRoutes } from './services/zipCodeService.js';
 import { requireAuth } from './middlewares/authMiddleware.js';
 
 
@@ -38,7 +39,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 console.log("Statischer Pfad:", path.join(__dirname, 'public'));
 app.use("/user/profile", requireAuth);
-app.use("/user/deviceConfiguration", requireAuth);
+app.use("/user/setDeviceConfiguration", requireAuth);
 app.use("/user/offers", requireAuth);
 app.use("/api/firmware/*splat", requireRegisteredDevice);
 app.use("/api/*splat", requireRegisteredDeviceWithConfig);
@@ -46,6 +47,7 @@ app.use("/api/*splat", requireRegisteredDeviceWithConfig);
 setupUserRoutes(app);
 setupFirmwareRoutes(app);
 setupAuthRoutes(app);
+setupZipCodeRoutes(app);
 
 
 app.get("/", (req, res) => {
@@ -128,7 +130,23 @@ app.get('/api/weather', async (req, res) => {
 });
 
 
-// ...existing code...
+app.get("/api/quoteOfTheDay", async (req, res) => {
+    try {
+        const { deviceId, config } = req;
+        if (!deviceId) {
+            return res.status(400).json({ error: 'Geräte-ID ist erforderlich.' });
+        }
+        if (config.error) {
+            return res.status(500).json(config);
+        }
+        const quoteOfTheDayData = await getQuoteOfTheDay();
+        res.json(quoteOfTheDayData);
+    } catch (error) {
+        console.error('Fehler beim Abrufen des Zitats:', error);
+        res.status(500).json({ error: 'Fehler beim Abrufen des Zitats.' });
+    }
+});
+
 
 // Debug-Endpoint außerhalb der Device-Middleware (kein /api/ Prefix)
 app.get("/debug/cache", async (req, res) => {

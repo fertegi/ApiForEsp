@@ -132,6 +132,16 @@ export async function getDeviceConfiguaration(deviceId) {
     return config;
 }
 
+export async function updateDeviceConfiguration(deviceId, updateData) {
+    const db = await getDatabase();
+    const deviceConfigurations = db.collection("deviceConfigurations");
+    const result = await deviceConfigurations.updateOne(
+        { deviceId: deviceId },
+        { $set: updateData }
+    );
+    return result;
+}
+
 // Graceful Shutdown für Vercel
 process.on('SIGTERM', async () => {
     console.log('SIGTERM empfangen, MongoDB Verbindung wird geschlossen...');

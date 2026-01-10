@@ -1,8 +1,10 @@
 import jwt from "jsonwebtoken";
 import { getCached, setCached } from "../clients/cacheClient.js";
+import { getDatabase } from "../clients/mongoClient.js";
 
 const JWT_SECRET = process.env.JWT_SECRET || "unsafe_jwt_secret";
 const TTL_TOKEN_CACHE = 3600; // 1 Stunde Cache für die Token-Blacklist
+const TTL_USER_CACHE = 300; // 5 Minuten Cache für User-Daten
 const JWT_COOKIE_NAME = 'auth_token';
 
 /**
@@ -44,11 +46,36 @@ export function requireAuth(req, res, next) {
                 }
                 return res.status(401).json({ error: "Token ist nicht mehr gültig" });
             }
-            // User-Infos an Request anhängen
-            req.user = {
-                username: decoded.username,
-                role: decoded.role,
-            };
+
+            // User aus MongoDB laden (mit Caching)
+            const userId = decoded.userId;
+            const cacheKey = `user:${userId}`;
+
+            let user = await getCached(cacheKey);
+
+            if (!user) {
+                const db = await getDatabase();
+                user = await db.collection("users").findOne({
+                    _id: new (await import('mongodb')).ObjectId(userId)
+                });
+
+                if (!user) {
+                    if (req.cookies?.[JWT_COOKIE_NAME]) {
+                        res.clearCookie(JWT_COOKIE_NAME);
+                        return res.redirect('/user/login');
+                    }
+                    return res.status(401).json({ error: "Benutzer nicht gefunden" });
+                }
+
+                // User cachen (ohne Passwort)
+                const userToCache = { ...user };
+                delete userToCache.password;
+                await setCached(cacheKey, userToCache, TTL_USER_CACHE);
+                user = userToCache;
+            }
+
+            // Vollständigen User an Request anhängen
+            req.user = user;
 
             // User-Info auch für Templates bereitstellen
             res.locals.user = req.user;
