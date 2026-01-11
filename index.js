@@ -140,7 +140,7 @@ app.get("/api/quoteOfTheDay", async (req, res) => {
             return res.status(500).json(config);
         }
         const quoteOfTheDayData = await getQuoteOfTheDay();
-        res.json(quoteOfTheDayData[0]);
+        res.json(quoteOfTheDayData);
     } catch (error) {
         console.error('Fehler beim Abrufen des Zitats:', error);
         res.status(500).json({ error: 'Fehler beim Abrufen des Zitats.' });

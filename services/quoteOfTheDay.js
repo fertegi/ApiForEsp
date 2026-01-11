@@ -10,7 +10,13 @@ export async function _getQuoteOfTheDay(options = {}) {
     if (!response.ok) {
         throw new Error(`Fehler beim Abrufen des Zitats: ${response.status}`);
     }
-    return response.json();
+    const data = await response.json();
+    console.log("Zitat des Tages abgerufen:", data);
+    if (data[0]["q"].length() > 72) {
+        console.log("Zitat zu lang, erneuter Versuch...");
+        return _getQuoteOfTheDay(options);
+    }
+    return data[0];
 }
 
 export const getQuoteOfTheDay = deviceCached(TTL_QUOTE)(_getQuoteOfTheDay);
