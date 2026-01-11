@@ -19,15 +19,15 @@ function loadZipCodeData() {
     try {
         const csvPath = join(__dirname, '..', 'public', 'zip_code_to_lat_long.csv');
         const csvContent = readFileSync(csvPath, 'utf-8');
-        
+
         zipCodeData = new Map();
-        
+
         const lines = csvContent.split('\n');
         // Erste Zeile (Header) überspringen
         for (let i = 1; i < lines.length; i++) {
             const line = lines[i].trim();
             if (!line) continue;
-            
+
             const [zipcode, lat, lng] = line.split(',');
             if (zipcode && lat && lng) {
                 zipCodeData.set(zipcode, {
@@ -36,7 +36,7 @@ function loadZipCodeData() {
                 });
             }
         }
-        
+
         console.log(`PLZ-Daten geladen: ${zipCodeData.size} Einträge`);
         return zipCodeData;
     } catch (error) {
@@ -81,17 +81,17 @@ export function setupZipCodeRoutes(app) {
     // Einzelne PLZ abfragen
     app.get('/api/zipcode/:zipCode', (req, res) => {
         const { zipCode } = req.params;
-        
+
         if (!zipCode || zipCode.length !== 5) {
             return res.status(400).json({ error: 'PLZ muss 5 Zeichen haben' });
         }
-        
+
         const coordinates = getCoordinatesForZipCode(zipCode);
-        
+
         if (!coordinates) {
             return res.status(404).json({ error: 'PLZ nicht gefunden' });
         }
-        
+
         res.json({
             zipCode,
             ...coordinates

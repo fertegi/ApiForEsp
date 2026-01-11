@@ -119,8 +119,6 @@ async function _getWeatherData(config) {
     };
 }
 
-// Exportierte, gecachte Version
-export const getWeatherData = deviceCached(TTL_WEATHER)(_getWeatherData);
 
 
 export function enrichWeatherData(weatherData) {
@@ -151,3 +149,7 @@ export function isBikeWeather(weather) {
     // Beispiel-Bewertung: angenehm zwischen 10-28°C, wenig Wind, kein Regen
     return apparentTemperature >= 10 && apparentTemperature <= 28 && windSpeed < 30 && precipitationProbability < 10;
 }
+
+
+// Exportierte, gecachte Version
+export const getWeatherData = deviceCached(TTL_WEATHER)(_getWeatherData);

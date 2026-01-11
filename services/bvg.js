@@ -138,7 +138,7 @@ export async function _getAllDepartures(stops, userLines) {
 
     return postprocessedData.length ? postprocessedData : [];
 }
-const TTL_DEPARTURES = 20; // 20 Sekunden
+const TTL_DEPARTURES = 30; // 30 Sekunden
 export const getAllDepartures = deviceCached(TTL_DEPARTURES)(_getAllDepartures);
 
 

@@ -11,12 +11,19 @@ export async function _getQuoteOfTheDay(options = {}) {
         throw new Error(`Fehler beim Abrufen des Zitats: ${response.status}`);
     }
     const data = await response.json();
-    console.log("Zitat des Tages abgerufen:", data);
-    if (data[0]["q"].length() > 72) {
+    console.log("Daten abgerufen:", data);
+    if (!data || !Array.isArray(data) || data.length === 0 || !data[0]["q"]) {
+        console.log("Ungültige Antwort vom Zitat-API:", data);
+        throw new Error("Ungültige Antwort vom Zitat-API");
+    }
+    const quoteOfTheDay = data[0];
+    const quote = quoteOfTheDay["q"];
+
+    if (quote.length > 72) {
         console.log("Zitat zu lang, erneuter Versuch...");
         return _getQuoteOfTheDay(options);
     }
-    return data[0];
+    return quoteOfTheDay;
 }
 
 export const getQuoteOfTheDay = deviceCached(TTL_QUOTE)(_getQuoteOfTheDay);
