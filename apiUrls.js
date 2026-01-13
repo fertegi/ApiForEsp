@@ -24,5 +24,5 @@ export const apiUrls = {
     },
     quoteOfTheDayApiUrl: (options = {}) => {
         return "https://zenquotes.io/api/quotes";
-    }
+    },
 }

@@ -126,10 +126,9 @@ export async function getDeviceConfiguaration(deviceId) {
     const db = await getDatabase();
     const deviceConfigurations = db.collection("deviceConfigurations");
 
-    // Versuche beide Varianten: String und ObjectId
     let config = await deviceConfigurations.findOne({ deviceId: deviceId });
-    if (!config && ObjectId.isValid(deviceId)) {
-        config = await deviceConfigurations.findOne({ _id: new ObjectId(deviceId) });
+    if (!config) {
+        throw new Error("Gerätekonfiguration nicht gefunden für Gerät: " + deviceId);
     }
     return config;
 }
@@ -137,8 +136,10 @@ export async function getDeviceConfiguaration(deviceId) {
 export async function updateDeviceConfiguration(deviceId, updateData) {
     const db = await getDatabase();
     const deviceConfigurations = db.collection("deviceConfigurations");
+    const filter = { deviceId: deviceId };
+
     const result = await deviceConfigurations.updateOne(
-        { deviceId: deviceId },
+        filter,
         { $set: updateData }
     );
     return result;

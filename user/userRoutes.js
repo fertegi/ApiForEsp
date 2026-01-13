@@ -2,6 +2,21 @@ import { getDeviceConfiguaration, updateDeviceConfiguration } from "../clients/m
 import { invalidateDeviceCache } from "../configLoader.js";
 import { getCoordinatesForZipCode } from "../services/zipCodeService.js";
 
+
+const TimeUtils = {
+    MS_PER_SECOND: 1000,
+    MS_PER_MINUTE: 60 * 1000,
+    MS_PER_HOUR: 60 * 60 * 1000,
+
+    msToHours: (ms) => Math.floor(ms / TimeUtils.MS_PER_HOUR),
+    msToSeconds: (ms) => Math.floor(ms / TimeUtils.MS_PER_SECOND),
+    msToMinutes: (ms) => Math.floor(ms / TimeUtils.MS_PER_MINUTE),
+
+    hoursToMs: (h) => h * TimeUtils.MS_PER_HOUR,
+    minutesToMs: (m) => m * TimeUtils.MS_PER_MINUTE,
+    secondsToMs: (s) => s * TimeUtils.MS_PER_SECOND,
+};
+
 // Validierungsfunktionen
 function validateLocation(location) {
     const errors = [];
@@ -107,6 +122,7 @@ export function setupUserRoutes(app) {
 
     app.post("/user/setDeviceConfiguration", async (req, res) => {
         const user = req.user;
+        console.log("Received configuration update: ", req.body);
         if (!user) {
             return res.redirect('/user/login');
         }
@@ -115,6 +131,8 @@ export function setupUserRoutes(app) {
 
         // Berechtigungsprüfung
         const userDevices = user.belongs || [];
+
+
         if (!userDevices.includes(deviceId)) {
             res.cookie('flash', JSON.stringify({ type: 'error', message: 'Keine Berechtigung für dieses Gerät' }));
             return res.redirect('/user/setDeviceConfiguration');
@@ -149,6 +167,7 @@ export function setupUserRoutes(app) {
             errors.push(...validateLocation(location));
             updateData.location = location;
         }
+        console.log("updateData after location ", updateData);
 
         // Weather
         if (req.body.hourThreshold || req.body.hour1 || req.body.hour2 || req.body.hour3) {
@@ -164,23 +183,31 @@ export function setupUserRoutes(app) {
             updateData.weather = weather;
         }
 
+        console.log("updateData after weather ", updateData);
+
         // Intervals
         if (req.body.intervalWeather || req.body.intervalOffers || req.body.intervalDepartures) {
             const intervals = {
-                weather: parseInt(req.body.intervalWeather),
-                offers: parseInt(req.body.intervalOffers),
-                departures: parseInt(req.body.intervalDepartures)
+                weather: parseInt(TimeUtils.hoursToMs(req.body.intervalWeather)),
+                offers: parseInt(TimeUtils.hoursToMs(req.body.intervalOffers)),
+                departures: parseInt(TimeUtils.secondsToMs(req.body.intervalDepartures)),
+                quoteOfTheDay: parseInt(TimeUtils.hoursToMs(req.body.intervalQuoteOfTheDay))
             };
             errors.push(...validateIntervals(intervals));
             updateData['deviceConfiguration.intervals'] = intervals;
         }
 
+        console.log("updateData after intervals ", updateData);
+
         // Features (Checkboxen)
         updateData['deviceConfiguration.features'] = {
             weather: req.body.featureWeather === 'on',
             offers: req.body.featureOffers === 'on',
-            departures: req.body.featureDepartures === 'on'
+            departures: req.body.featureDepartures === 'on',
+            quoteOfTheDay: req.body.featureQuoteOfTheDay === 'on'
         };
+
+        console.log("updateData after features ", updateData);
 
         // Bei Validierungsfehlern zurück
         if (errors.length > 0) {
@@ -191,7 +218,7 @@ export function setupUserRoutes(app) {
         try {
             // Update in MongoDB
             await updateDeviceConfiguration(deviceId, updateData);
-
+            console.log("Gerätekonfiguration aktualisiert für Gerät:", deviceId);
             // Cache invalidieren
             await invalidateDeviceCache(deviceId);
 

@@ -17,7 +17,7 @@ import { getQuoteOfTheDay } from './services/quoteOfTheDay.js';
 import { setupUserRoutes } from "./user/userRoutes.js"
 import { setupFirmwareRoutes } from './firmware/firmwareRoutes.js';
 import { setupAuthRoutes } from './user/authRoutes.js';
-import { setupZipCodeRoutes } from './services/zipCodeService.js';
+import { setupUtilRoutes } from './services/zipCodeService.js';
 import { requireAuth } from './middlewares/authMiddleware.js';
 
 
@@ -43,11 +43,11 @@ app.use("/user/setDeviceConfiguration", requireAuth);
 app.use("/user/offers", requireAuth);
 app.use("/api/firmware/*splat", requireRegisteredDevice);
 app.use("/api/*splat", requireRegisteredDeviceWithConfig);
-
+app.use("/utils/zipCode/*splat", requireAuth);
 setupUserRoutes(app);
 setupFirmwareRoutes(app);
 setupAuthRoutes(app);
-setupZipCodeRoutes(app);
+setupUtilRoutes(app);
 
 
 app.get("/", (req, res) => {

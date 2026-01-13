@@ -77,9 +77,9 @@ export function getAllZipCodes() {
 /**
  * Setup der API-Route für PLZ-Lookup
  */
-export function setupZipCodeRoutes(app) {
+export function setupUtilRoutes(app) {
     // Einzelne PLZ abfragen
-    app.get('/api/zipcode/:zipCode', (req, res) => {
+    app.get('/utils/zipCode/:zipCode', (req, res) => {
         const { zipCode } = req.params;
 
         if (!zipCode || zipCode.length !== 5) {
@@ -99,7 +99,7 @@ export function setupZipCodeRoutes(app) {
     });
 
     // PLZ validieren (für schnelle Checks)
-    app.get('/api/zipcode/:zipCode/valid', (req, res) => {
+    app.get('/utils/zipCode/:zipCode/valid', (req, res) => {
         const { zipCode } = req.params;
         res.json({ valid: isValidZipCode(zipCode) });
     });
