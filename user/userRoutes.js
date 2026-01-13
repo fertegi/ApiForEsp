@@ -107,7 +107,6 @@ export function setupUserRoutes(app) {
 
     app.post("/user/setDeviceConfiguration", async (req, res) => {
         const user = req.user;
-
         if (!user) {
             return res.redirect('/user/login');
         }
@@ -129,7 +128,7 @@ export function setupUserRoutes(app) {
         if (req.body.zipCode) {
             let latitude = parseFloat(req.body.latitude);
             let longitude = parseFloat(req.body.longitude);
-            
+
             // Wenn Koordinaten fehlen oder ungültig, aus PLZ ermitteln
             if (isNaN(latitude) || isNaN(longitude)) {
                 const coords = getCoordinatesForZipCode(req.body.zipCode);
@@ -140,7 +139,7 @@ export function setupUserRoutes(app) {
                     errors.push('PLZ nicht gefunden - bitte gültige deutsche PLZ eingeben');
                 }
             }
-            
+
             const location = {
                 zipCode: req.body.zipCode,
                 latitude: latitude,

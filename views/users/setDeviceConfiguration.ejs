@@ -142,9 +142,26 @@
     </div>
 
     <script>
-        // Konfigurationen als JavaScript-Objekt
-        const configurations = JSON.parse('<%= JSON.stringify(configurations) %>');
 
+        function milliSecondsToHours(valueInMs) {
+            return Math.floor(valueInMs / (1000 * 60 * 60));
+        }
+
+        function minutesToMilliSeconds(valueInMinutes) {
+            return valueInMinutes * 60 * 1000;
+        }
+
+        function secondsToMilliSeconds(valueInSeconds) {
+            return valueInSeconds * 1000;
+        }
+
+        function hoursToMilliSeconds(valueInHours) {
+            return valueInHours * 60 * 60 * 1000;
+        };
+
+        // Konfigurationen als JavaScript-Objekt
+        const configurations = <%- JSON.stringify(configurations) %> || [];
+        console.log("config ", configurations);
         function loadConfig(deviceId) {
             const config = configurations.find(c => c.deviceId === deviceId);
             if (!config || !config.config) return;
@@ -171,9 +188,9 @@
 
             // Features
             const features = cfg.deviceConfiguration?.features || {};
-            document.getElementById('featureWeather').checked = features.weather || false;
-            document.getElementById('featureOffers').checked = features.offers || false;
-            document.getElementById('featureDepartures').checked = features.departures || false;
+            document.getElementById('featureWeather').checked = features.weather || true;
+            document.getElementById('featureOffers').checked = features.offers || true;
+            document.getElementById('featureDepartures').checked = features.departures || true;
         }
 
         // PLZ-Lookup für automatische Koordinaten

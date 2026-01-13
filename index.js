@@ -139,8 +139,11 @@ app.get("/api/quoteOfTheDay", async (req, res) => {
         if (config.error) {
             return res.status(500).json(config);
         }
-        const quoteOfTheDayData = await getQuoteOfTheDay();
+        // we expecting an array with one element
+        const data = await getQuoteOfTheDay();
+        const quoteOfTheDayData = data[0];
         res.json(quoteOfTheDayData);
+
     } catch (error) {
         console.error('Fehler beim Abrufen des Zitats:', error);
         res.status(500).json({ error: 'Fehler beim Abrufen des Zitats.' });

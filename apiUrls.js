@@ -23,6 +23,6 @@ export const apiUrls = {
         return `${this.marktGuruApiUrl}/offers/search/?${params.toString()}`
     },
     quoteOfTheDayApiUrl: (options = {}) => {
-        return "https://zenquotes.io/?api=random";
+        return "https://zenquotes.io/api/quotes";
     }
 }

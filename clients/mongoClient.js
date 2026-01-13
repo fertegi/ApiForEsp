@@ -1,4 +1,4 @@
-import { MongoClient, ServerApiVersion } from "mongodb";
+import { MongoClient, ServerApiVersion, ObjectId } from "mongodb";
 import { apiUrls } from "../apiUrls.js";
 
 class MongoDBConnection {
@@ -125,10 +125,12 @@ export async function getAllDevices() {
 export async function getDeviceConfiguaration(deviceId) {
     const db = await getDatabase();
     const deviceConfigurations = db.collection("deviceConfigurations");
-    const config = await deviceConfigurations.findOne({
-        deviceId:
-            deviceId
-    });
+
+    // Versuche beide Varianten: String und ObjectId
+    let config = await deviceConfigurations.findOne({ deviceId: deviceId });
+    if (!config && ObjectId.isValid(deviceId)) {
+        config = await deviceConfigurations.findOne({ _id: new ObjectId(deviceId) });
+    }
     return config;
 }
 
@@ -141,6 +143,30 @@ export async function updateDeviceConfiguration(deviceId, updateData) {
     );
     return result;
 }
+
+export async function getQuotesFromCache() {
+    const db = await getDatabase();
+    const quotes = db.collection("quotesCache");
+    const cache = await quotes.findOne({ _id: "dailyQuotes" });
+    return cache;
+}
+
+export async function saveQuotesToCache(quotesArray, ttlSeconds) {
+    const db = await getDatabase();
+    const quotes = db.collection("quotesCache");
+    await quotes.updateOne(
+        { _id: "dailyQuotes" },
+        {
+            $set: {
+                quotes: quotesArray,
+                updatedAt: new Date(),
+                expiresAt: new Date(Date.now() + ttlSeconds * 1000)
+            }
+        },
+        { upsert: true }
+    );
+}
+
 
 // Graceful Shutdown für Vercel
 process.on('SIGTERM', async () => {
