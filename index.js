@@ -14,6 +14,8 @@ import { getOffersFromConfig } from './services/marktguru.js';
 import { getAllDepartures } from './services/bvg.js';
 import { getWeatherData } from './services/weather.js';
 import { getQuoteOfTheDay } from './services/quoteOfTheDay.js';
+import { getNewsOfTheDay } from './services/newsOfTheDay.js';
+
 import { setupUserRoutes } from "./user/userRoutes.js"
 import { setupFirmwareRoutes } from './firmware/firmwareRoutes.js';
 import { setupAuthRoutes } from './user/authRoutes.js';
@@ -149,6 +151,26 @@ app.get("/api/quoteOfTheDay", async (req, res) => {
         res.status(500).json({ error: 'Fehler beim Abrufen des Zitats.' });
     }
 });
+
+app.get("/api/newsOfTheDay", async (req, res) => {
+    try {
+        const { deviceId, config } = req;
+        if (!deviceId) {
+            return res.status(400).json({ error: 'Geräte-ID ist erforderlich.' });
+        }
+        if (config.error) {
+            return res.status(500).json(config);
+        }
+        const data = await getNewsOfTheDay(config.newsOfTheDay || {});
+        res.json(data);
+
+    } catch (error) {
+        console.error('Fehler beim Abrufen der Nachrichten:', error);
+        res.status(500).json({ error: 'Fehler beim Abrufen der Nachrichten.' });
+    }
+});
+
+
 
 
 // Debug-Endpoint außerhalb der Device-Middleware (kein /api/ Prefix)

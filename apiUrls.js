@@ -25,4 +25,7 @@ export const apiUrls = {
     quoteOfTheDayApiUrl: (options = {}) => {
         return "https://zenquotes.io/api/quotes";
     },
+    newsOftheDayApiUrl: (options = {}) => {
+        return "https://newsdata.io/api/1/latest?apikey=" + (process.env.NEWS_API_KEY || '');
+    }
 }
