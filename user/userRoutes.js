@@ -1,6 +1,7 @@
 import { getDeviceConfiguaration, updateDeviceConfiguration } from "../clients/mongoClient.js";
 import { invalidateDeviceCache } from "../configLoader.js";
 import { getCoordinatesForZipCode } from "../services/zipCodeService.js";
+    import { deviceConfigSchema } from "../deviceConfigSchema.js";
 
 
 const TimeUtils = {
@@ -88,6 +89,7 @@ export function setupUserRoutes(app) {
         });
     });
 
+    // Schema für dynamische Felder importieren
     app.get("/user/setDeviceConfiguration", async (req, res) => {
         const user = req.user;
 
@@ -116,40 +118,43 @@ export function setupUserRoutes(app) {
         return res.render("users/setDeviceConfiguration", {
             user: user,
             configurations: configurations,
+            deviceConfigSchema: deviceConfigSchema,
             flash: flashMessage ? JSON.parse(flashMessage) : null
         });
     });
 
     app.post("/user/setDeviceConfiguration", async (req, res) => {
         const user = req.user;
-        console.log("Received configuration update: ", req.body);
         if (!user) {
             return res.redirect('/user/login');
         }
 
-        const { deviceId } = req.body;
+        let configObj = {};
+        let deviceId = req.body.deviceId;
+        try {
+            if (req.body.configJson) {
+                configObj = JSON.parse(req.body.configJson);
+                deviceId = configObj.deviceId || deviceId;
+            }
+        } catch (e) {
+            res.cookie('flash', JSON.stringify({ type: 'error', message: 'Ungültige Konfigurationsdaten.' }));
+            return res.redirect('/user/setDeviceConfiguration');
+        }
 
         // Berechtigungsprüfung
         const userDevices = user.belongs || [];
-
-
         if (!userDevices.includes(deviceId)) {
             res.cookie('flash', JSON.stringify({ type: 'error', message: 'Keine Berechtigung für dieses Gerät' }));
             return res.redirect('/user/setDeviceConfiguration');
         }
 
-        // Daten aus dem Formular extrahieren und validieren
+        // Validierung und ggf. Koordinaten-Lookup für location
         const errors = [];
-        const updateData = {};
-
-        // Location - Koordinaten automatisch aus PLZ ermitteln wenn nur PLZ angegeben
-        if (req.body.zipCode) {
-            let latitude = parseFloat(req.body.latitude);
-            let longitude = parseFloat(req.body.longitude);
-
-            // Wenn Koordinaten fehlen oder ungültig, aus PLZ ermitteln
+        if (configObj.location && configObj.location.zipCode) {
+            let latitude = parseFloat(configObj.location.latitude);
+            let longitude = parseFloat(configObj.location.longitude);
             if (isNaN(latitude) || isNaN(longitude)) {
-                const coords = getCoordinatesForZipCode(req.body.zipCode);
+                const coords = getCoordinatesForZipCode(configObj.location.zipCode);
                 if (coords) {
                     latitude = coords.latitude;
                     longitude = coords.longitude;
@@ -157,71 +162,25 @@ export function setupUserRoutes(app) {
                     errors.push('PLZ nicht gefunden - bitte gültige deutsche PLZ eingeben');
                 }
             }
-
-            const location = {
-                zipCode: req.body.zipCode,
-                latitude: latitude,
-                longitude: longitude
-            };
-
-            errors.push(...validateLocation(location));
-            updateData.location = location;
+            configObj.location.latitude = latitude;
+            configObj.location.longitude = longitude;
+            errors.push(...validateLocation(configObj.location));
         }
-        console.log("updateData after location ", updateData);
-
-        // Weather
-        if (req.body.hourThreshold || req.body.hour1 || req.body.hour2 || req.body.hour3) {
-            const weather = {
-                hourThreshold: parseInt(req.body.hourThreshold),
-                hoursToForecast: [
-                    parseInt(req.body.hour1),
-                    parseInt(req.body.hour2),
-                    parseInt(req.body.hour3)
-                ].filter(h => !isNaN(h))
-            };
-            errors.push(...validateWeather(weather));
-            updateData.weather = weather;
+        if (configObj.weather) {
+            errors.push(...validateWeather(configObj.weather));
+        }
+        if (configObj.deviceConfiguration && configObj.deviceConfiguration.intervals) {
+            errors.push(...validateIntervals(configObj.deviceConfiguration.intervals));
         }
 
-        console.log("updateData after weather ", updateData);
-
-        // Intervals
-        if (req.body.intervalWeather || req.body.intervalOffers || req.body.intervalDepartures) {
-            const intervals = {
-                weather: parseInt(TimeUtils.hoursToMs(req.body.intervalWeather)),
-                offers: parseInt(TimeUtils.hoursToMs(req.body.intervalOffers)),
-                departures: parseInt(TimeUtils.secondsToMs(req.body.intervalDepartures)),
-                quoteOfTheDay: parseInt(TimeUtils.hoursToMs(req.body.intervalQuoteOfTheDay))
-            };
-            errors.push(...validateIntervals(intervals));
-            updateData['deviceConfiguration.intervals'] = intervals;
-        }
-
-        console.log("updateData after intervals ", updateData);
-
-        // Features (Checkboxen)
-        updateData['deviceConfiguration.features'] = {
-            weather: req.body.featureWeather === 'on',
-            offers: req.body.featureOffers === 'on',
-            departures: req.body.featureDepartures === 'on',
-            quoteOfTheDay: req.body.featureQuoteOfTheDay === 'on'
-        };
-
-        console.log("updateData after features ", updateData);
-
-        // Bei Validierungsfehlern zurück
         if (errors.length > 0) {
             res.cookie('flash', JSON.stringify({ type: 'error', message: errors.join(', ') }));
             return res.redirect('/user/setDeviceConfiguration');
         }
 
         try {
-            // Update in MongoDB
-            await updateDeviceConfiguration(deviceId, updateData);
-            console.log("Gerätekonfiguration aktualisiert für Gerät:", deviceId);
-            // Cache invalidieren
+            await updateDeviceConfiguration(deviceId, configObj);
             await invalidateDeviceCache(deviceId);
-
             res.cookie('flash', JSON.stringify({ type: 'success', message: 'Konfiguration erfolgreich gespeichert!' }));
             return res.redirect('/user/setDeviceConfiguration');
         } catch (error) {

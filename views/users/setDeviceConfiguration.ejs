@@ -21,7 +21,8 @@
         <% } %>
 
         <div class="config-form-container">
-            <form method="POST" action="/user/setDeviceConfiguration" id="configForm">
+            <form method="POST" action="/user/setDeviceConfiguration" id="configForm" autocomplete="off">
+        
 
                 <!-- Geräte-Auswahl -->
                 <div class="form-section">
@@ -38,99 +39,13 @@
                     </div>
                 </div>
 
-                <!-- Standort -->
-                <div class="form-section">
-                    <h3>📍 Standort</h3>
-                    <div class="form-group">
-                        <label for="zipCode">Postleitzahl:</label>
-                        <input type="text" name="zipCode" id="zipCode" maxlength="5" pattern="[0-9]{5}"
-                            placeholder="z.B. 10249">
-                        <small id="zipCodeStatus" class="field-status"></small>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="latitude">Breitengrad:</label>
-                            <input type="number" name="latitude" id="latitude" step="0.001" min="-90" max="90"
-                                placeholder="wird automatisch ermittelt" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label for="longitude">Längengrad:</label>
-                            <input type="number" name="longitude" id="longitude" step="0.001" min="-180" max="180"
-                                placeholder="wird automatisch ermittelt" readonly>
-                        </div>
-                    </div>
-                </div>
+                <!-- Dynamisches Rendering: Basic Felder -->
+                <div id="basic-fields"></div>
 
-                <!-- Wetter -->
-                <div class="form-section">
-                    <h3>🌤️ Wetter</h3>
-                    <div class="form-group">
-                        <label for="hourThreshold">Stunden-Schwellwert:</label>
-                        <input type="number" name="hourThreshold" id="hourThreshold" min="0" max="24"
-                            placeholder="z.B. 20">
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="hour1">Vorhersage 1 (Uhr):</label>
-                            <input type="number" name="hour1" id="hour1" min="0" max="23" placeholder="z.B. 9">
-                        </div>
-                        <div class="form-group">
-                            <label for="hour2">Vorhersage 2 (Uhr):</label>
-                            <input type="number" name="hour2" id="hour2" min="0" max="23" placeholder="z.B. 11">
-                        </div>
-                        <div class="form-group">
-                            <label for="hour3">Vorhersage 3 (Uhr):</label>
-                            <input type="number" name="hour3" id="hour3" min="0" max="23" placeholder="z.B. 19">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Intervalle -->
-                <div class="form-section">
-                    <h3>⏱️ Aktualisierungs-Intervalle (h)</h3>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="intervalWeather">Wetter:</label>
-                            <input type="number" name="intervalWeather" id="intervalWeather" min="1" step="1" max="42"
-                                placeholder="z.B. 10 Stunden">
-                        </div>
-                        <div class="form-group">
-                            <label for="intervalOffers">Angebote:</label>
-                            <input type="number" name="intervalOffers" id="intervalOffers" min="1" step="1" max="42"
-                                placeholder="z.B. 16 Stunden">
-                        </div>
-                        <div class="form-group">
-                            <label for="intervalDepartures">Abfahrten (s):</label>
-                            <input type="number" name="intervalDepartures" id="intervalDepartures" min="1" step="1"
-                                max="600" placeholder="z.B. 30 Sekunden">
-                        </div>
-                        <div class="form-group">
-                            <label for="intervalQuoteOfTheDay">Zitate:</label>
-                            <input type="number" name="intervalQuoteOfTheDay" id="intervalQuoteOfTheDay" min="1"
-                                max="23" step="1" placeholder="z.B. 20 Stunden">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Features -->
-                <div class="form-section">
-                    <h3>✨ Aktivierte Features</h3>
-                    <div class="checkbox-group">
-                        <input type="checkbox" name="featureWeather" id="featureWeather">
-                        <label for="featureWeather">Wetter anzeigen</label>
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" name="featureOffers" id="featureOffers">
-                        <label for="featureOffers">Angebote anzeigen</label>
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" name="featureDepartures" id="featureDepartures">
-                        <label for="featureDepartures">Abfahrten anzeigen</label>
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" name="featureQuoteOfTheDay" id="featureQuoteOfTheDay">
-                        <label for="featureQuoteOfTheDay">Zitat des Tages anzeigen</label>
-                    </div>
+                <details class="form-section">
+                    <summary><h3>🔧 Erweiterte Einstellungen</h3></summary>
+                    <div id="advanced-fields"></div>
+                </details>
 
                     <div class="button-group">
                         <button type="submit" class="btn btn-primary">💾 Speichern</button>
@@ -145,7 +60,58 @@
     </div>
 
     <script>
+// Hilfsfunktion: Wert in verschachteltem Objekt per Key-Path setzen
+        function setValueByPath(obj, path, value) {
+            const parts = path.replace(/\[(\d+)\]/g, '.$1').split('.');
+            let curr = obj;
+            for (let i = 0; i < parts.length - 1; i++) {
+                if (!curr[parts[i]]) curr[parts[i]] = isNaN(Number(parts[i+1])) ? {} : [];
+                curr = curr[parts[i]];
+            }
+            curr[parts[parts.length - 1]] = value;
+        }
 
+        document.getElementById('configForm').addEventListener('submit', function(e) {
+            // Dynamisches Mapping aller Felder
+            const formData = new FormData(this);
+            const configObj = {};
+            deviceConfigSchema.forEach(field => {
+                const id = keyToId(field.key);
+                let value;
+                if (field.type === 'checkbox') {
+                    value = formData.get(id) === 'on';
+                } else if (field.type === 'tags') {
+                    value = formData.get(id)?.split(',').map(s => s.trim()).filter(Boolean) || [];
+                } else if (field.type === 'number') {
+                    value = formData.get(id);
+                    value = value === '' ? null : Number(value);
+                } else {
+                    value = formData.get(id);
+                }
+
+                // Spezialbehandlung für Intervalle (h/s -> ms)
+                if (field.key.startsWith('deviceConfiguration.intervals.')) {
+                    if (field.unit === 'h' && value != null) value = TimeUtils.hoursToMs(value);
+                    if (field.unit === 's' && value != null) value = TimeUtils.secondsToMs(value);
+                }
+
+                setValueByPath(configObj, field.key, value);
+            });
+
+            // deviceId extra
+            configObj.deviceId = formData.get('deviceId');
+
+            // Sende als JSON (per hidden input)
+            let hidden = document.getElementById('configJson');
+            if (!hidden) {
+                hidden = document.createElement('input');
+                hidden.type = 'hidden';
+                hidden.name = 'configJson';
+                hidden.id = 'configJson';
+                this.appendChild(hidden);
+            }
+            hidden.value = JSON.stringify(configObj);
+        });
         const TimeUtils = {
             MS_PER_SECOND: 1000,
             MS_PER_MINUTE: 60 * 1000,
@@ -162,40 +128,89 @@
         // Konfigurationen als JavaScript-Objekt
         // das hier wird falsch formatiert
         const configurations = <%- JSON.stringify(configurations) %> || [];
+        const deviceConfigSchema = <%- JSON.stringify(deviceConfigSchema) %>;
+                // Hilfsfunktion: Key-Path-zu-Name/ID (z.B. weather.hoursToForecast[0] => weather_hoursToForecast_0)
+                function keyToId(key) {
+                    return key.replace(/\./g, '_').replace(/\[(\d+)\]/g, '_$1');
+                }
+
+                // Dynamisches Rendering der Felder
+                function renderFields() {
+                    const basicFields = deviceConfigSchema.filter(f => f.group === 'basic');
+                    const advancedFields = deviceConfigSchema.filter(f => f.group === 'advanced');
+                    document.getElementById('basic-fields').innerHTML = basicFields.map(renderField).join('');
+                    document.getElementById('advanced-fields').innerHTML = advancedFields.map(renderField).join('');
+                }
+
+                function renderField(field) {
+                    const id = keyToId(field.key);
+                    let html = '';
+                    if (field.type === 'checkbox') {
+                        html += `<div class="checkbox-group">
+                            <input type="checkbox" name="${id}" id="${id}">
+                            <label for="${id}">${field.label}</label>
+                        </div>`;
+                    } else if (field.type === 'tags') {
+                        html += `<div class="form-group">
+                            <label for="${id}">${field.label}</label>
+                            <input type="text" name="${id}" id="${id}" placeholder="${field.placeholder || ''}">
+                        </div>`;
+                    } else {
+                        html += `<div class="form-group">
+                            <label for="${id}">${field.label}</label>
+                            <input type="${field.type}" name="${id}" id="${id}" 
+                                ${field.min !== undefined ? `min=\"${field.min}\"` : ''}
+                                ${field.max !== undefined ? `max=\"${field.max}\"` : ''}
+                                ${field.step !== undefined ? `step=\"${field.step}\"` : ''}
+                                ${field.pattern ? `pattern=\"${field.pattern}\"` : ''}
+                                ${field.maxLength ? `maxlength=\"${field.maxLength}\"` : ''}
+                                placeholder="${field.placeholder || ''}">
+                        </div>`;
+                    }
+                    return html;
+                }
+
+                // Initiales Rendern
+                renderFields();
         console.log("config ", configurations);
+        // Hilfsfunktion: Wert aus verschachteltem Objekt per Key-Path holen
+        function getValueByPath(obj, path) {
+            if (!obj) return undefined;
+            const parts = path.replace(/\[(\d+)\]/g, '.$1').split('.');
+            return parts.reduce((acc, part) => (acc && acc[part] !== undefined ? acc[part] : undefined), obj);
+        }
+
         function loadConfig(deviceId) {
             const config = configurations.find(c => c.deviceId === deviceId);
             if (!config || !config.config) return;
-
             const cfg = config.config;
 
-            // Location
-            document.getElementById('zipCode').value = cfg.location?.zipCode || '';
-            document.getElementById('latitude').value = cfg.location?.latitude || '';
-            document.getElementById('longitude').value = cfg.location?.longitude || '';
+            deviceConfigSchema.forEach(field => {
+                const id = keyToId(field.key);
+                const el = document.getElementById(id);
+                if (!el) return;
+                let value = getValueByPath(cfg, field.key);
 
-            // Weather
-            document.getElementById('hourThreshold').value = cfg.weather?.hourThreshold || '';
-            const hours = cfg.weather?.hoursToForecast || [];
-            document.getElementById('hour1').value = hours[0] ?? '';
-            document.getElementById('hour2').value = hours[1] ?? '';
-            document.getElementById('hour3').value = hours[2] ?? '';
+                // Spezialbehandlung für Intervalle (ms <-> h/s)
+                if (field.key.startsWith('deviceConfiguration.intervals.')) {
+                    if (value !== undefined && value !== null) {
+                        if (field.unit === 'h') value = TimeUtils.msToHours(value);
+                        if (field.unit === 's') value = TimeUtils.msToSeconds(value);
+                    } else {
+                        value = '';
+                    }
+                }
 
-            // Intervals
-            const intervals = cfg.deviceConfiguration?.intervals || {};
-            document.getElementById('intervalWeather').value = TimeUtils.msToHours(intervals.weather) ?? '';
-            document.getElementById('intervalOffers').value = TimeUtils.msToHours(intervals.offers) ?? '';
-            document.getElementById('intervalDepartures').value = TimeUtils.msToSeconds(intervals.departures) ?? '';
-            console.log("intervals.quoteOfTheDay ", intervals.quoteOfTheDay);
-            document.getElementById('intervalQuoteOfTheDay').value = TimeUtils.msToHours(intervals.quoteOfTheDay) ?? '';
-
-            // Features
-            const features = cfg.deviceConfiguration?.features || {};
-            document.getElementById('featureWeather').checked = features.weather || true;
-            document.getElementById('featureOffers').checked = features.offers || true;
-            document.getElementById('featureDepartures').checked = features.departures || true;
-            document.getElementById('featureQuoteOfTheDay').checked = features.quoteOfTheDay || true;
-
+                // Checkboxen
+                if (field.type === 'checkbox') {
+                    el.checked = !!value;
+                } else if (field.type === 'tags') {
+                    // Arrays als Komma-getrennte Strings
+                    el.value = Array.isArray(value) ? value.join(', ') : (value || '');
+                } else {
+                    el.value = value ?? '';
+                }
+            });
         }
 
         // PLZ-Lookup für automatische Koordinaten
