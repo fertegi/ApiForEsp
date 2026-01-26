@@ -1,7 +1,7 @@
 import { getDeviceConfiguaration, updateDeviceConfiguration } from "../clients/mongoClient.js";
 import { invalidateDeviceCache } from "../configLoader.js";
 import { getCoordinatesForZipCode } from "../services/zipCodeService.js";
-    import { deviceConfigSchema } from "../deviceConfigSchema.js";
+import { deviceConfigSchema } from "../deviceConfigSchema.js";
 
 
 const TimeUtils = {

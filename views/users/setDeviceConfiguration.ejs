@@ -22,7 +22,7 @@
 
         <div class="config-form-container">
             <form method="POST" action="/user/setDeviceConfiguration" id="configForm" autocomplete="off">
-        
+
 
                 <!-- Geräte-Auswahl -->
                 <div class="form-section">
@@ -43,14 +43,16 @@
                 <div id="basic-fields"></div>
 
                 <details class="form-section">
-                    <summary><h3>🔧 Erweiterte Einstellungen</h3></summary>
+                    <summary>
+                        <h3>🔧 Erweiterte Einstellungen</h3>
+                    </summary>
                     <div id="advanced-fields"></div>
                 </details>
 
-                    <div class="button-group">
-                        <button type="submit" class="btn btn-primary">💾 Speichern</button>
-                        <a href="/user/profile" class="btn btn-secondary">Zurück</a>
-                    </div>
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">💾 Speichern</button>
+                    <a href="/user/profile" class="btn btn-secondary">Zurück</a>
+                </div>
             </form>
         </div>
 
@@ -60,18 +62,18 @@
     </div>
 
     <script>
-// Hilfsfunktion: Wert in verschachteltem Objekt per Key-Path setzen
+        // Hilfsfunktion: Wert in verschachteltem Objekt per Key-Path setzen
         function setValueByPath(obj, path, value) {
             const parts = path.replace(/\[(\d+)\]/g, '.$1').split('.');
             let curr = obj;
             for (let i = 0; i < parts.length - 1; i++) {
-                if (!curr[parts[i]]) curr[parts[i]] = isNaN(Number(parts[i+1])) ? {} : [];
+                if (!curr[parts[i]]) curr[parts[i]] = isNaN(Number(parts[i + 1])) ? {} : [];
                 curr = curr[parts[i]];
             }
             curr[parts[parts.length - 1]] = value;
         }
 
-        document.getElementById('configForm').addEventListener('submit', function(e) {
+        document.getElementById('configForm').addEventListener('submit', function (e) {
             // Dynamisches Mapping aller Felder
             const formData = new FormData(this);
             const configObj = {};
@@ -127,36 +129,36 @@
         };
         // Konfigurationen als JavaScript-Objekt
         // das hier wird falsch formatiert
-        const configurations = <%- JSON.stringify(configurations) %> || [];
-        const deviceConfigSchema = <%- JSON.stringify(deviceConfigSchema) %>;
-                // Hilfsfunktion: Key-Path-zu-Name/ID (z.B. weather.hoursToForecast[0] => weather_hoursToForecast_0)
-                function keyToId(key) {
-                    return key.replace(/\./g, '_').replace(/\[(\d+)\]/g, '_$1');
-                }
+        const configurations = <% - JSON.stringify(configurations) %> || [];
+        const deviceConfigSchema = <% - JSON.stringify(deviceConfigSchema) %>;
+        // Hilfsfunktion: Key-Path-zu-Name/ID (z.B. weather.hoursToForecast[0] => weather_hoursToForecast_0)
+        function keyToId(key) {
+            return key.replace(/\./g, '_').replace(/\[(\d+)\]/g, '_$1');
+        }
 
-                // Dynamisches Rendering der Felder
-                function renderFields() {
-                    const basicFields = deviceConfigSchema.filter(f => f.group === 'basic');
-                    const advancedFields = deviceConfigSchema.filter(f => f.group === 'advanced');
-                    document.getElementById('basic-fields').innerHTML = basicFields.map(renderField).join('');
-                    document.getElementById('advanced-fields').innerHTML = advancedFields.map(renderField).join('');
-                }
+        // Dynamisches Rendering der Felder
+        function renderFields() {
+            const basicFields = deviceConfigSchema.filter(f => f.group === 'basic');
+            const advancedFields = deviceConfigSchema.filter(f => f.group === 'advanced');
+            document.getElementById('basic-fields').innerHTML = basicFields.map(renderField).join('');
+            document.getElementById('advanced-fields').innerHTML = advancedFields.map(renderField).join('');
+        }
 
-                function renderField(field) {
-                    const id = keyToId(field.key);
-                    let html = '';
-                    if (field.type === 'checkbox') {
-                        html += `<div class="checkbox-group">
+        function renderField(field) {
+            const id = keyToId(field.key);
+            let html = '';
+            if (field.type === 'checkbox') {
+                html += `<div class="checkbox-group">
                             <input type="checkbox" name="${id}" id="${id}">
                             <label for="${id}">${field.label}</label>
                         </div>`;
-                    } else if (field.type === 'tags') {
-                        html += `<div class="form-group">
+            } else if (field.type === 'tags') {
+                html += `<div class="form-group">
                             <label for="${id}">${field.label}</label>
                             <input type="text" name="${id}" id="${id}" placeholder="${field.placeholder || ''}">
                         </div>`;
-                    } else {
-                        html += `<div class="form-group">
+            } else {
+                html += `<div class="form-group">
                             <label for="${id}">${field.label}</label>
                             <input type="${field.type}" name="${id}" id="${id}" 
                                 ${field.min !== undefined ? `min=\"${field.min}\"` : ''}
@@ -166,12 +168,12 @@
                                 ${field.maxLength ? `maxlength=\"${field.maxLength}\"` : ''}
                                 placeholder="${field.placeholder || ''}">
                         </div>`;
-                    }
-                    return html;
-                }
+            }
+            return html;
+        }
 
-                // Initiales Rendern
-                renderFields();
+        // Initiales Rendern
+        renderFields();
         console.log("config ", configurations);
         // Hilfsfunktion: Wert aus verschachteltem Objekt per Key-Path holen
         function getValueByPath(obj, path) {
