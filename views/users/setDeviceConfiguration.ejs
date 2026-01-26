@@ -129,8 +129,8 @@
         };
         // Konfigurationen als JavaScript-Objekt
         // das hier wird falsch formatiert
-        const configurations = <% - JSON.stringify(configurations) %> || [];
-        const deviceConfigSchema = <% - JSON.stringify(deviceConfigSchema) %>;
+        const configurations = <%- JSON.stringify(configurations) %> || [];
+        const deviceConfigSchema = <%- JSON.stringify(deviceConfigSchema) %>;
         // Hilfsfunktion: Key-Path-zu-Name/ID (z.B. weather.hoursToForecast[0] => weather_hoursToForecast_0)
         function keyToId(key) {
             return key.replace(/\./g, '_').replace(/\[(\d+)\]/g, '_$1');
