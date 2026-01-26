@@ -30,10 +30,9 @@
                     <div class="form-group">
                         <label for="deviceSelect">Gerät:</label>
                         <select name="deviceId" id="deviceSelect" onchange="loadConfig(this.value)">
-                            <% configurations.forEach(function(item, index) { %>
-                            <option value="<%= item.deviceId %>" <%=index===0 ? 'selected' : '' %>>
-                                <%= item.deviceId %>
-                            </option>
+                            <option value="" selected disabled>Bitte Gerät auswählen</option>
+                            <% configurations.forEach(function(item) { %>
+                            <option value="<%= item.deviceId %>"><%= item.deviceId %></option>
                             <% }); %>
                         </select>
                     </div>
