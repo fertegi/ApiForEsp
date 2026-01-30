@@ -26,7 +26,7 @@
 
                 <!-- Geräte-Auswahl -->
                 <div class="form-section">
-                    <h3>📱 Gerät auswählen</h3>
+                    <h3 id="device-selection">📱 Gerät auswählen</h3>
                     <div class="form-group">
                         <label for="deviceSelect">Gerät:</label>
                         <select name="deviceId" id="deviceSelect" onchange="loadConfig(this.value)">
@@ -39,8 +39,9 @@
                 </div>
 
                 <!-- Dynamisches Rendering: Basic Felder -->
-                <div id="basic-fields"></div>
-
+                <div id="categories-container">
+                    <div id="basic-fields"></div>
+                </div>
                 <details class="form-section">
                     <summary>
                         <h3>🔧 Erweiterte Einstellungen</h3>
@@ -61,7 +62,19 @@
     </div>
 
     <script>
-        // Hilfsfunktion: Wert in verschachteltem Objekt per Key-Path setzen
+        // ==== Konstanten & Hilfsfunktionen ====
+        const TimeUtils = {
+            MS_PER_SECOND: 1000,
+            MS_PER_MINUTE: 60 * 1000,
+            MS_PER_HOUR: 60 * 60 * 1000,
+            msToHours: ms => Math.floor(ms / TimeUtils.MS_PER_HOUR),
+            msToSeconds: ms => Math.floor(ms / TimeUtils.MS_PER_SECOND),
+            msToMinutes: ms => Math.floor(ms / TimeUtils.MS_PER_MINUTE),
+            hoursToMs: h => h * TimeUtils.MS_PER_HOUR,
+            minutesToMs: m => m * TimeUtils.MS_PER_MINUTE,
+            secondsToMs: s => s * TimeUtils.MS_PER_SECOND,
+        };
+
         function setValueByPath(obj, path, value) {
             const parts = path.replace(/\[(\d+)\]/g, '.$1').split('.');
             let curr = obj;
@@ -72,10 +85,126 @@
             curr[parts[parts.length - 1]] = value;
         }
 
-        document.getElementById('configForm').addEventListener('submit', function (e) {
-            // Dynamisches Mapping aller Felder
+        function getValueByPath(obj, path) {
+            if (!obj) return undefined;
+            const parts = path.replace(/\[(\d+)\]/g, '.$1').split('.');
+            return parts.reduce((acc, part) => (acc && acc[part] !== undefined ? acc[part] : undefined), obj);
+        }
+
+        function keyToId(key) {
+            return key.replace(/\./g, '_').replace(/\[(\d+)\]/g, '_$1');
+        }
+
+        // ==== Globale Variablen ====
+        let stopIds = [];
+        const configurations = <%- JSON.stringify(configurations) %> || [];
+        const deviceConfigSchema = <%- JSON.stringify(deviceConfigSchema) %>;
+
+        // ==== Rendering ====
+        function renderFields() {
+            const basicFields = deviceConfigSchema.filter(f => f.group === 'basic');
+            const advancedFields = deviceConfigSchema.filter(f => f.group === 'advanced');
+            const categoryMap = {};
+
+            basicFields.forEach(field => {
+                if (field.category) {
+                    if (!categoryMap[field.category]) categoryMap[field.category] = [];
+                    categoryMap[field.category].push(field);
+                }
+            });
+
+            const basicFieldsHtml = Object.entries(categoryMap).map(([category, fields]) =>
+                `<fieldset class="form-category">
+                <legend>${category}</legend>
+                ${fields.map(renderField).join('')}
+            </fieldset>`
+            ).join('');
+
+            document.getElementById('basic-fields').innerHTML = basicFieldsHtml;
+            document.getElementById('advanced-fields').innerHTML = advancedFields.map(renderField).join('');
+        }
+
+        function renderField(field) {
+            const id = keyToId(field.key);
+            if (field.type === 'checkbox') {
+                return `<div class="checkbox-group">
+                        <input type="checkbox" name="${id}" id="${id}">
+                        <label for="${id}">${field.label}</label>
+                    </div>`;
+            }
+            if (field.type === 'tags') {
+                return `<div class="form-group">
+                        <label for="${id}">${field.label}</label>
+                        <input type="text" name="${id}" id="${id}" placeholder="${field.placeholder || ''}">
+                    </div>`;
+            }
+            if (field.type === "search") {
+                return `
+                <div class="form-group">
+                <label for="stopIdsSearchInput">${field.label}</label>
+                    <input type="text" id="stopIdsSearchInput" placeholder="Haltestelle suchen...">
+                    <div id="stopIdsSearchSuggestions"></div>
+                    <div class="stopTags" id="stopIdsSearchTags"></div>
+                    </div>`;
+            }
+            return `<div class="form-group">
+                    <label for="${id}">${field.label}</label>
+                    <input type="${field.type}" name="${id}" id="${id}" 
+                        ${field.min !== undefined ? `min="${field.min}"` : ''}
+                        ${field.max !== undefined ? `max="${field.max}"` : ''}
+                        ${field.step !== undefined ? `step="${field.step}"` : ''}
+                        ${field.pattern ? `pattern="${field.pattern}"` : ''}
+                        ${field.maxLength ? `maxlength="${field.maxLength}"` : ''}
+                        placeholder="${field.placeholder || ''}">
+                </div>`;
+        }
+
+        // ==== StopId-Suche & Tags ====
+        async function handleStopIdSearchInput(e) {
+            const query = e.target.value;
+            if (query.length < 3) return;
+            const res = await fetch(`/utils/stopIdSearch/${encodeURIComponent(query)}`);
+            const stops = await res.json();
+            const suggestions = stops.map(stop =>
+                `<div class="suggestionItem" data-id="${stop.id}" data-name="${stop.name}">${stop.name} (${stop.id})</div>`
+            ).join('');
+            document.getElementById("stopIdsSearchSuggestions").innerHTML = suggestions;
+        }
+
+        function handleStopIdSuggestionClick(e) {
+            if (e.target.classList.contains('suggestionItem')) {
+                const id = e.target.dataset.id;
+                const name = e.target.dataset.name;
+                if (!stopIds.some(s => s.id === id)) {
+                    stopIds.push({ id, name });
+                    renderStopIdsTags();
+                }
+                document.getElementById('stopIdsSearchInput').value = '';
+                document.getElementById('stopIdsSearchSuggestions').innerHTML = '';
+            }
+        }
+
+        function renderStopIdsTags() {
+            document.getElementById('stopIdsSearchTags').innerHTML = stopIds.map(s =>
+                `<span class="suggestionItem">${s.name} (${s.id}) <button class="closeBtn" type="button" onclick="removeStopId('${s.id}')">x</button></span>`
+            ).join('');
+        }
+
+        window.removeStopId = function (id) {
+            stopIds = stopIds.filter(s => s.id !== id);
+            renderStopIdsTags();
+        };
+
+        function addEventListeners() {
+            document.getElementById("stopIdsSearchInput")?.addEventListener("input", handleStopIdSearchInput);
+            document.getElementById('stopIdsSearchSuggestions')?.addEventListener('click', handleStopIdSuggestionClick);
+        }
+
+        // ==== Formular-Handling ====
+        function handleFormSubmit(e) {
             const formData = new FormData(this);
             const configObj = {};
+
             deviceConfigSchema.forEach(field => {
                 const id = keyToId(field.key);
                 let value;
@@ -83,6 +212,9 @@
                     value = formData.get(id) === 'on';
                 } else if (field.type === 'tags') {
                     value = formData.get(id)?.split(',').map(s => s.trim()).filter(Boolean) || [];
+                } else if (field.type === 'search') {
+                    // value = stopIds.map(s => s.id);
+                    value = stopIds;
                 } else if (field.type === 'number') {
                     value = formData.get(id);
                     value = value === '' ? null : Number(value);
@@ -95,14 +227,11 @@
                     if (field.unit === 'h' && value != null) value = TimeUtils.hoursToMs(value);
                     if (field.unit === 's' && value != null) value = TimeUtils.secondsToMs(value);
                 }
-
                 setValueByPath(configObj, field.key, value);
             });
 
-            // deviceId extra
             configObj.deviceId = formData.get('deviceId');
 
-            // Sende als JSON (per hidden input)
             let hidden = document.getElementById('configJson');
             if (!hidden) {
                 hidden = document.createElement('input');
@@ -112,87 +241,23 @@
                 this.appendChild(hidden);
             }
             hidden.value = JSON.stringify(configObj);
-        });
-        const TimeUtils = {
-            MS_PER_SECOND: 1000,
-            MS_PER_MINUTE: 60 * 1000,
-            MS_PER_HOUR: 60 * 60 * 1000,
-
-            msToHours: (ms) => Math.floor(ms / TimeUtils.MS_PER_HOUR),
-            msToSeconds: (ms) => Math.floor(ms / TimeUtils.MS_PER_SECOND),
-            msToMinutes: (ms) => Math.floor(ms / TimeUtils.MS_PER_MINUTE),
-
-            hoursToMs: (h) => h * TimeUtils.MS_PER_HOUR,
-            minutesToMs: (m) => m * TimeUtils.MS_PER_MINUTE,
-            secondsToMs: (s) => s * TimeUtils.MS_PER_SECOND,
-        };
-        // Konfigurationen als JavaScript-Objekt
-        // das hier wird falsch formatiert
-        const configurations = <%- JSON.stringify(configurations) %> || [];
-        const deviceConfigSchema = <%- JSON.stringify(deviceConfigSchema) %>;
-        // Hilfsfunktion: Key-Path-zu-Name/ID (z.B. weather.hoursToForecast[0] => weather_hoursToForecast_0)
-        function keyToId(key) {
-            return key.replace(/\./g, '_').replace(/\[(\d+)\]/g, '_$1');
         }
 
-        // Dynamisches Rendering der Felder
-        function renderFields() {
-            const basicFields = deviceConfigSchema.filter(f => f.group === 'basic');
-            const advancedFields = deviceConfigSchema.filter(f => f.group === 'advanced');
-            document.getElementById('basic-fields').innerHTML = basicFields.map(renderField).join('');
-            document.getElementById('advanced-fields').innerHTML = advancedFields.map(renderField).join('');
-        }
-
-        function renderField(field) {
-            const id = keyToId(field.key);
-            let html = '';
-            if (field.type === 'checkbox') {
-                html += `<div class="checkbox-group">
-                            <input type="checkbox" name="${id}" id="${id}">
-                            <label for="${id}">${field.label}</label>
-                        </div>`;
-            } else if (field.type === 'tags') {
-                html += `<div class="form-group">
-                            <label for="${id}">${field.label}</label>
-                            <input type="text" name="${id}" id="${id}" placeholder="${field.placeholder || ''}">
-                        </div>`;
-            } else {
-                html += `<div class="form-group">
-                            <label for="${id}">${field.label}</label>
-                            <input type="${field.type}" name="${id}" id="${id}" 
-                                ${field.min !== undefined ? `min=\"${field.min}\"` : ''}
-                                ${field.max !== undefined ? `max=\"${field.max}\"` : ''}
-                                ${field.step !== undefined ? `step=\"${field.step}\"` : ''}
-                                ${field.pattern ? `pattern=\"${field.pattern}\"` : ''}
-                                ${field.maxLength ? `maxlength=\"${field.maxLength}\"` : ''}
-                                placeholder="${field.placeholder || ''}">
-                        </div>`;
-            }
-            return html;
-        }
-
-        // Initiales Rendern
-        renderFields();
-        console.log("config ", configurations);
-        // Hilfsfunktion: Wert aus verschachteltem Objekt per Key-Path holen
-        function getValueByPath(obj, path) {
-            if (!obj) return undefined;
-            const parts = path.replace(/\[(\d+)\]/g, '.$1').split('.');
-            return parts.reduce((acc, part) => (acc && acc[part] !== undefined ? acc[part] : undefined), obj);
-        }
-
+        // ==== Konfiguration laden ====
         function loadConfig(deviceId) {
             const config = configurations.find(c => c.deviceId === deviceId);
             if (!config || !config.config) return;
             const cfg = config.config;
-
             deviceConfigSchema.forEach(field => {
-                const id = keyToId(field.key);
+                let id;
+                if (field.key.includes("stopIds")) {
+                    id = "stopIdsSearchTags";
+                } else {
+                    id = keyToId(field.key);
+                }
                 const el = document.getElementById(id);
                 if (!el) return;
                 let value = getValueByPath(cfg, field.key);
-
-                // Spezialbehandlung für Intervalle (ms <-> h/s)
                 if (field.key.startsWith('deviceConfiguration.intervals.')) {
                     if (value !== undefined && value !== null) {
                         if (field.unit === 'h') value = TimeUtils.msToHours(value);
@@ -201,71 +266,27 @@
                         value = '';
                     }
                 }
-
-                // Checkboxen
+                console.log(`Setting field ${field.key} (id: ${id}) to value:`, value);
                 if (field.type === 'checkbox') {
                     el.checked = !!value;
                 } else if (field.type === 'tags') {
-                    // Arrays als Komma-getrennte Strings
                     el.value = Array.isArray(value) ? value.join(', ') : (value || '');
+                } else if (field.type === 'search') {
+                    stopIds = Array.isArray(value) ? value : [];
+                    renderStopIdsTags();
+                    el.value = '';
                 } else {
                     el.value = value ?? '';
                 }
             });
+            document.getElementById('device-selection').innerHTML = deviceId ? `📱 Gerät: ${deviceId}` : '📱 Gerät auswählen';
         }
 
-        // PLZ-Lookup für automatische Koordinaten
-        async function lookupZipCode(zipCode) {
-            const statusEl = document.getElementById('zipCodeStatus');
-            const latEl = document.getElementById('latitude');
-            const lngEl = document.getElementById('longitude');
-
-            if (!zipCode || zipCode.length !== 5) {
-                statusEl.textContent = '';
-                statusEl.className = 'field-status';
-                return;
-            }
-
-            try {
-                statusEl.textContent = 'Suche...';
-                statusEl.className = 'field-status';
-
-                const response = await fetch(`/utils/zipCode/${zipCode}`);
-
-                if (response.ok) {
-                    const data = await response.json();
-                    latEl.value = data.latitude;
-                    lngEl.value = data.longitude;
-                    statusEl.textContent = '✓ Koordinaten gefunden';
-                    statusEl.className = 'field-status field-status-success';
-                } else {
-                    latEl.value = '';
-                    lngEl.value = '';
-                    statusEl.textContent = '✗ PLZ nicht gefunden';
-                    statusEl.className = 'field-status field-status-error';
-                }
-            } catch (error) {
-                console.error('PLZ-Lookup Fehler:', error);
-                statusEl.textContent = '✗ Fehler bei der Abfrage';
-                statusEl.className = 'field-status field-status-error';
-            }
-        }
-
-        // Event Listener für PLZ-Eingabe
-        document.getElementById('zipCode').addEventListener('input', function (e) {
-            const zipCode = e.target.value.replace(/\D/g, ''); // Nur Zahlen
-            e.target.value = zipCode;
-
-            if (zipCode.length === 5) {
-                lookupZipCode(zipCode);
-            }
-        });
-
-        // Beim Laden die erste Konfiguration anzeigen
-        document.addEventListener('DOMContentLoaded', function () {
-            if (configurations.length > 0) {
-                loadConfig(configurations[0].deviceId);
-            }
+        // ==== Initialisierung ====
+        function init() {
+            renderFields();
+            addEventListeners();
+            document.getElementById('configForm').addEventListener('submit', handleFormSubmit);
 
             // Flash-Message nach 4 Sekunden ausblenden
             const flashMessage = document.querySelector('.flash-message');
@@ -275,7 +296,9 @@
                     setTimeout(() => flashMessage.remove(), 500);
                 }, 4000);
             }
-        });
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 

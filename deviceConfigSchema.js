@@ -11,6 +11,7 @@ export const deviceConfigSchema = [
         placeholder: 'z.B. 10249',
         pattern: '[0-9]{5}',
         maxLength: 5,
+        category: 'Allgemein'
     },
     {
         group: 'basic',
@@ -20,6 +21,7 @@ export const deviceConfigSchema = [
         min: 0,
         max: 24,
         placeholder: 'z.B. 20',
+        category: '☀️ Wetter App'
     },
     {
         group: 'basic',
@@ -29,6 +31,7 @@ export const deviceConfigSchema = [
         min: 0,
         max: 23,
         placeholder: 'z.B. 9',
+        category: '☀️ Wetter App'
     },
     {
         group: 'basic',
@@ -38,6 +41,7 @@ export const deviceConfigSchema = [
         min: 0,
         max: 23,
         placeholder: 'z.B. 12',
+        category: '☀️ Wetter App'
     },
     {
         group: 'basic',
@@ -47,8 +51,9 @@ export const deviceConfigSchema = [
         min: 0,
         max: 23,
         placeholder: 'z.B. 18',
+        category: '☀️ Wetter App'
     },
-    // --- ADVANCED ---
+
     {
         group: 'advanced',
         key: 'deviceConfiguration.intervals.weather',
@@ -59,6 +64,7 @@ export const deviceConfigSchema = [
         step: 1,
         placeholder: 'z.B. 10',
         unit: 'h',
+        category: '☀️ Wetter App'
     },
     {
         group: 'advanced',
@@ -70,6 +76,7 @@ export const deviceConfigSchema = [
         step: 1,
         placeholder: 'z.B. 16',
         unit: 'h',
+        category: '📣 Angebote App'
     },
     {
         group: 'advanced',
@@ -81,6 +88,7 @@ export const deviceConfigSchema = [
         step: 1,
         placeholder: 'z.B. 30',
         unit: 's',
+        category: '🚂 Abfahrten App'
     },
     {
         group: 'advanced',
@@ -92,78 +100,86 @@ export const deviceConfigSchema = [
         step: 1,
         placeholder: 'z.B. 20',
         unit: 'h',
+        category: '📝 Zitat des Tages App'
     },
     {
         group: 'advanced',
         key: 'deviceConfiguration.features.weather',
         type: 'checkbox',
         label: 'Wetter anzeigen',
+        category: 'Allgemein'
     },
     {
         group: 'advanced',
         key: 'deviceConfiguration.features.offers',
         type: 'checkbox',
         label: 'Angebote anzeigen',
+        category: 'Allgemein'
     },
     {
         group: 'advanced',
         key: 'deviceConfiguration.features.departures',
         type: 'checkbox',
         label: 'Abfahrten anzeigen',
+        category: 'Allgemein'
     },
     {
         group: 'advanced',
         key: 'deviceConfiguration.features.quoteOfTheDay',
         type: 'checkbox',
         label: 'Zitat des Tages anzeigen',
+        category: 'Allgemein'
     },
     // --- OFFERS ---
     {
-        group: 'advanced',
+        group: 'basic',
         key: 'offers.retailers',
         type: 'tags',
         label: 'Händler (Komma-getrennt)',
         placeholder: 'z.B. rewe, aldi-nord, lidl',
+        category: '📣 Angebote App'
+
     },
     {
-        group: 'advanced',
+        group: 'basic',
         key: 'offers.searchKeywords',
         type: 'tags',
-        label: 'Suchbegriffe (Komma-getrennt)',
+        label: ' Angebot Suchbegriffe (Komma-getrennt)',
         placeholder: 'z.B. chips, cola',
+        category: '📣 Angebote App'
     },
     // --- DEPARTURES ---
     {
-        group: 'advanced',
-        key: 'departures.resultCount',
-        type: 'number',
-        label: 'Abfahrten: Anzahl Ergebnisse',
-        min: 1,
-        max: 10,
-        step: 1,
-        placeholder: 'z.B. 5',
-    },
-    {
-        group: 'advanced',
+        group: 'basic',
         key: 'departures.userLines',
         type: 'tags',
         label: 'Linien (Komma-getrennt)',
         placeholder: 'z.B. U8, M43, S42',
+        category: '🚂 Abfahrten App'
     },
-
+    {
+        group: "basic",
+        key: "departures.stopIds",
+        type: "search",
+        label: "Haltestellen (StopIDs)",
+        placeholder: "Haltestellen suchen und hinzufügen",
+        category: "🚂 Abfahrten App"
+    },
     // --- NEWS OF THE DAY ---
     {
         group: "basic",
         key: "newsOfTheDay.keywords",
         type: "tags",
         label: "Nachrichten-Schlagwörter (Komma-getrennt)",
-        placeholder: "z.B. Politik, Sport, Technologie"
+        placeholder: "z.B. Politik, Sport, Technologie",
+        category: '📰 Nachrichten App'
     },
     {
         group: "basic",
         key: "newsOfTheDay.languages",
         type: "tags",
         label: "Nachrichten-Sprachen (Komma-getrennt)",
-        placeholder: "z.B. de, en, fr"
+        placeholder: "z.B. de, en, fr",
+        category: '📰 Nachrichten App'
     }
 ]

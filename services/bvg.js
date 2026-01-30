@@ -104,17 +104,37 @@ export function postprocessData(data) {
     });
 }
 
-export async function _getAllDepartures(stops, userLines) {
+export async function getStopIdsByLocation(lat, lon, distance = 500) {
+    const url = `https://v6.vbb.transport.rest/locations/nearby?latitude=${lat}&longitude=${lon}&distance=${distance}&results=5&poi=false&stops=true`;
+    const res = await fetch(url);
+    const data = await res.json();
+    const stopIds = data.map(stop => stop.id) || [];
+    return stopIds;
+}
+
+
+
+export async function _getAllDepartures(config) {
+    const { userLines = [], stopIdDistance = 500 } = config.departures || {};
+    const { latitude, longitude } = config.location || {};
     const data = [];
-    const locs = stops || [];
-    if (!locs.length) {
-        console.log('No locations found in config');
-        return data;
+    const stopIds = config.departures.stopIds.map(i => i.id) || [];
+    console.log("Configured Stop IDs:", stopIds);
+    // Wenn keine StopIDs konfiguriert sind, versuchen, sie basierend auf dem Standort abzurufen
+    if ((!stopIds || stopIds.length === 0) && latitude && longitude) {
+        console.log("No stop IDs configured, fetching based on location.");
+        try {
+            const fetchedStopIds = await getStopIdsByLocation(latitude, longitude, stopIdDistance);
+            console.log("Fetched Stop IDs based on location:", fetchedStopIds);
+            stopIds.push(...fetchedStopIds);
+        } catch (e) {
+            console.log("Error fetching stop IDs by location:", e);
+        }
     }
-    for (const loc of locs) {
-        const stopId = loc.id;
+
+    for (const stopId of stopIds) {
         if (!stopId) {
-            console.log(`StopID missing for location: ${JSON.stringify(loc)} `);
+            console.log(`StopID missing for location: ${JSON.stringify(stopId)} `);
             continue;
         }
         let departures = [];
@@ -140,5 +160,3 @@ export async function _getAllDepartures(stops, userLines) {
 }
 const TTL_DEPARTURES = 30; // 30 Sekunden
 export const getAllDepartures = deviceCached(TTL_DEPARTURES)(_getAllDepartures);
-
-

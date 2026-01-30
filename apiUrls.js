@@ -19,13 +19,13 @@ export const apiUrls = {
     },
     marktGuruBaseUrl: "http://marktguru.de",
     marktGuruApiUrl: "https://api.marktguru.de/api/v1",
-    marktGuruSearchUrl: function (params) {
-        return `${this.marktGuruApiUrl}/offers/search/?${params.toString()}`
+    marktGuruSearchUrl: (params) => {
+        return `${apiUrls.marktGuruApiUrl}/offers/search/?${params.toString()}`
     },
     quoteOfTheDayApiUrl: (options = {}) => {
         return "https://zenquotes.io/api/quotes";
     },
     newsOftheDayApiUrl: (options = {}) => {
         return "https://newsdata.io/api/1/latest?apikey=" + (process.env.NEWS_API_KEY || '');
-    }
+    },
 }

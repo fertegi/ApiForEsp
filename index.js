@@ -39,7 +39,6 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
-console.log("Statischer Pfad:", path.join(__dirname, 'public'));
 app.use("/user/profile", requireAuth);
 app.use("/user/setDeviceConfiguration", requireAuth);
 app.use("/user/offers", requireAuth);
@@ -98,10 +97,7 @@ app.get("/api/departures", async (req, res) => {
         if (config.error) {
             return res.status(500).json(config);
         }
-
-        const stops = config.departures.stops || [];
-        const userLines = config.departures.userLines || [];
-        const departures = await getAllDepartures(stops, userLines);
+        const departures = await getAllDepartures(config);
         if (!departures || departures.length === 0) {
             return res.status(404).json({ message: 'Keine Abfahrten gefunden.' });
         }

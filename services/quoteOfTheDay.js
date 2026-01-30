@@ -9,6 +9,7 @@ const FALLBACK_QUOTE = {
     q: "Do what you can, with what you have.",
     a: "Theodore Roosevelt"
 }
+
 async function refreshQuoteCache() {
     const url = apiUrls.quoteOfTheDayApiUrl();
     const response = await fetch(url);

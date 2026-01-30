@@ -78,29 +78,44 @@ export function getAllZipCodes() {
  * Setup der API-Route für PLZ-Lookup
  */
 export function setupUtilRoutes(app) {
-    // Einzelne PLZ abfragen
-    app.get('/utils/zipCode/:zipCode', (req, res) => {
-        const { zipCode } = req.params;
+    // // Einzelne PLZ abfragen
+    // app.get('/utils/zipCode/:zipCode', (req, res) => {
+    //     const { zipCode } = req.params;
 
-        if (!zipCode || zipCode.length !== 5) {
-            return res.status(400).json({ error: 'PLZ muss 5 Zeichen haben' });
+    //     if (!zipCode || zipCode.length !== 5) {
+    //         return res.status(400).json({ error: 'PLZ muss 5 Zeichen haben' });
+    //     }
+
+    //     const coordinates = getCoordinatesForZipCode(zipCode);
+
+    //     if (!coordinates) {
+    //         return res.status(404).json({ error: 'PLZ nicht gefunden' });
+    //     }
+
+    //     res.json({
+    //         zipCode,
+    //         ...coordinates
+    //     });
+    // });
+
+    // // PLZ validieren (für schnelle Checks)
+    // app.get('/utils/zipCode/:zipCode/valid', (req, res) => {
+    //     const { zipCode } = req.params;
+    //     res.json({ valid: isValidZipCode(zipCode) });
+    // });
+
+    app.get("/utils/stopIdSearch/:query", async (req, res) => {
+        const { query } = req.params;
+        if (!query || query.length < 3) {
+            return res.status(400).json({ error: 'Suchbegriff muss mindestens 3 Zeichen haben' });
         }
+        const response = await fetch(`https://v6.vbb.transport.rest/locations?query=${encodeURIComponent(query)}&fuzzy=true&results=10&stops=true&addresses=false&poi=false&linesOfStops=false&language=en`);
+        const data = await response.json();
+        const stops = (data || []).map(stop => ({
+            id: stop.id,
+            name: stop.name
+        }));
 
-        const coordinates = getCoordinatesForZipCode(zipCode);
-
-        if (!coordinates) {
-            return res.status(404).json({ error: 'PLZ nicht gefunden' });
-        }
-
-        res.json({
-            zipCode,
-            ...coordinates
-        });
-    });
-
-    // PLZ validieren (für schnelle Checks)
-    app.get('/utils/zipCode/:zipCode/valid', (req, res) => {
-        const { zipCode } = req.params;
-        res.json({ valid: isValidZipCode(zipCode) });
+        res.json(stops);
     });
 }
