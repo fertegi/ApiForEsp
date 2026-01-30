@@ -119,7 +119,6 @@ export async function _getAllDepartures(config) {
     const { latitude, longitude } = config.location || {};
     const data = [];
     const stopIds = config.departures.stopIds.map(i => i.id) || [];
-    console.log("Configured Stop IDs:", stopIds);
     // Wenn keine StopIDs konfiguriert sind, versuchen, sie basierend auf dem Standort abzurufen
     if ((!stopIds || stopIds.length === 0) && latitude && longitude) {
         console.log("No stop IDs configured, fetching based on location.");
