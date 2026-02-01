@@ -181,5 +181,13 @@ export const deviceConfigSchema = [
         label: "Nachrichten-Sprachen (Komma-getrennt)",
         placeholder: "z.B. de, en, fr",
         category: '📰 Nachrichten App'
+    },
+    {
+        group: "basic",
+        key: "newsOfTheDay.rssFeedUrl",
+        type: "text",
+        label: "RSS-Feed URL (optional)",
+        placeholder: "z.B. https://www.formel1.de/rss/formel-1/feed.xml",
+        category: '📰 Nachrichten App'
     }
 ]

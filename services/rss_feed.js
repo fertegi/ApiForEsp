@@ -1,20 +1,34 @@
 import { deviceCached } from "../cacheDecorator.js";
 import Parser from 'rss-parser';
 
+const TTL_RSS = 3600; // 1 Stunde Cache
+const parser = new Parser();
 
-// TODO: ermögliche es dem user bei newsOfTheDay eine RSS-Feed quelle anzugeben.
-// dafür muss in der DB ein neues Feld für den user angelegt werden, das mache ich.
-// momentan ist das hier hardcoded auf einen feed für Formel 1 Nachrichten als beispiel
-// der user soll aber in der Lage sein, seinen eigenen feed anzugeben, unter setDeviceConfiguration.ejs
-// für deviceConfiguarionSchema muss das URL Feld hinzugefügt werden.
-let parser = new Parser();
-
-const rss_url = "https://www.formel1.de/rss/formel-1/feed.xml";
-
-async function fetchRssFeed() {
-    const feed = await parser.parseURL(rss_url);
-    return feed.items;
+/**
+ * Fetches and parses an RSS feed from the given URL
+ * @param {string} rssFeedUrl - The URL of the RSS feed to fetch
+ * @returns {Promise<Array>} Array of feed items with normalized structure
+ */
+async function _fetchRssFeed(rssFeedUrl) {
+    if (!rssFeedUrl) {
+        throw new Error("RSS Feed URL ist erforderlich");
+    }
+    
+    try {
+        const feed = await parser.parseURL(rssFeedUrl);
+        
+        // Normalize the RSS feed items to match the news structure
+        return feed.items.map(item => ({
+            title: item.title || '',
+            link: item.link || '',
+            creator: item.creator || item.author || feed.title || 'Unbekannt',
+            pubDate: item.pubDate || item.isoDate || new Date().toISOString(),
+            description: item.contentSnippet || item.content || item.description || ''
+        }));
+    } catch (error) {
+        console.error(`Fehler beim Abrufen des RSS-Feeds von ${rssFeedUrl}:`, error);
+        throw new Error(`Fehler beim Abrufen des RSS-Feeds: ${error.message}`);
+    }
 }
 
-const data = await fetchRssFeed();
-console.log(data[0]);
+export const fetchRssFeed = deviceCached(TTL_RSS)(_fetchRssFeed);

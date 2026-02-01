@@ -1,6 +1,6 @@
 import { apiUrls } from "../apiUrls.js";
 import { deviceCached } from '../cacheDecorator.js';
-
+import { fetchRssFeed } from './rss_feed.js';
 
 
 const TTL_NEWS = 3600; // 1 Stunde Cache
@@ -41,6 +41,13 @@ async function fetchNewsFromApi(keywords = [], languages = LANGUAGES, pageSize =
 
 
 async function _getNewsOfTheDay(config) {
+    // Check if user provided a custom RSS feed URL
+    if (config.rssFeedUrl) {
+        // Use RSS feed instead of the news API
+        return await fetchRssFeed(config.rssFeedUrl);
+    }
+    
+    // Otherwise, use the default news API
     const keywords = config.keywords || [];
     const languages = config.languages || LANGUAGES;
     const pageSize = config.pageSize || PAGE_SIZE;
