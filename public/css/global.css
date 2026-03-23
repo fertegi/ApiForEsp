@@ -163,6 +163,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    min-height: 100dvh;
     margin: 0;
 }
 
@@ -490,4 +491,81 @@ input[readonly] {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+}
+
+/* ===== Mobile Responsive ===== */
+@media (max-width: 640px) {
+
+    body {
+        align-items: flex-start;
+        min-height: 100dvh;
+    }
+
+    .container {
+        width: 100%;
+        margin: 0;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        border-top: none;
+        padding: 1.2rem 1rem 2rem;
+        min-height: 100dvh;
+    }
+
+    h1 {
+        font-size: 1.4rem;
+    }
+
+    h2 {
+        font-size: 1.2rem;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .form-row .form-group {
+        margin-bottom: 1.2rem;
+    }
+
+    .button-group {
+        flex-direction: column;
+    }
+
+    .button-group .btn {
+        width: 100%;
+    }
+
+    .form-section {
+        padding: 0.8rem;
+        border-radius: 16px;
+    }
+
+    .form-section h3 {
+        font-size: 1rem;
+        padding: 0.7rem;
+    }
+
+    .form-category {
+        border-radius: 16px;
+        padding: 0.8rem;
+    }
+
+    /* Tooltip auf kleinen Bildschirmen nach links ausrichten */
+    .tooltip-text {
+        right: auto;
+        left: 0;
+        width: min(220px, 80vw);
+    }
+
+    /* Stop-Tags responsiv */
+    .stopTags {
+        flex-direction: column;
+    }
+
+    /* SVG Logo verkleinern */
+    .container > div > svg:first-child {
+        width: 90% !important;
+    }
 }
