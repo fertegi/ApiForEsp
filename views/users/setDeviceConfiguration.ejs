@@ -190,6 +190,11 @@
         const configurations = <%- JSON.stringify(configurations) %> || [];
         const deviceConfigSchema = <%- JSON.stringify(deviceConfigSchema) %>;
 
+        const STOP_SEARCH_DEBOUNCE_MS = 250;
+        const stopSearchCache = new Map();
+        let stopSearchTimer = null;
+        let stopSearchController = null;
+
         // ==== Rendering ====
         function renderFields() {
             const basicFields = deviceConfigSchema.filter(f => f.group === 'basic');
@@ -274,28 +279,97 @@
         }
 
         // ==== StopId-Suche & Tags ====
-        async function handleStopIdSearchInput(e) {
-            const query = e.target.value;
-            if (query.length < 3) return;
-            const res = await fetch(`/utils/stopIdSearch/${encodeURIComponent(query)}`);
-            const stops = await res.json();
-            const suggestions = stops.map(stop =>
-                `<div class="suggestionItem" data-id="${stop.id}" data-name="${stop.name}">${stop.name} (${stop.id})</div>`
+        function resetStopIdSearch() {
+            clearTimeout(stopSearchTimer);
+            stopSearchController?.abort();
+            stopSearchController = null;
+            const input = document.getElementById('stopIdsSearchInput');
+            const suggestions = document.getElementById('stopIdsSearchSuggestions');
+            if (input) input.value = '';
+            if (suggestions) suggestions.innerHTML = '';
+        }
+
+        function addStopId(id, name) {
+            if (!id) return;
+            if (!stopIds.some(s => s.id === id)) {
+                stopIds.push({ id, name });
+                renderStopIdsTags();
+            }
+            resetStopIdSearch();
+        }
+
+        function renderStopSuggestions(stops) {
+            const container = document.getElementById("stopIdsSearchSuggestions");
+            if (!container) return;
+            if (!stops.length) {
+                container.innerHTML = '<div class="suggestionHint">Keine Haltestelle gefunden</div>';
+                return;
+            }
+            container.innerHTML = stops.map(stop =>
+                `<div class="suggestionItem" data-id="${escapeHtml(stop.id)}" data-name="${escapeHtml(stop.name)}">${escapeHtml(stop.name)} (${escapeHtml(stop.id)})</div>`
             ).join('');
-            document.getElementById("stopIdsSearchSuggestions").innerHTML = suggestions;
+        }
+
+        function escapeHtml(value) {
+            const div = document.createElement('div');
+            div.textContent = value ?? '';
+            return div.innerHTML;
+        }
+
+        async function searchStopIds(query) {
+            const container = document.getElementById("stopIdsSearchSuggestions");
+
+            if (stopSearchCache.has(query)) {
+                renderStopSuggestions(stopSearchCache.get(query));
+                return;
+            }
+
+            // Vorherige Anfrage abbrechen, damit eine langsame Antwort keine neuere überschreibt
+            stopSearchController?.abort();
+            stopSearchController = new AbortController();
+
+            if (container) container.innerHTML = '<div class="suggestionHint">Suche…</div>';
+
+            try {
+                const res = await fetch(`/utils/stopIdSearch/${encodeURIComponent(query)}`, {
+                    signal: stopSearchController.signal
+                });
+                if (!res.ok) throw new Error(`Status ${res.status}`);
+                const stops = await res.json();
+                stopSearchCache.set(query, stops);
+                renderStopSuggestions(stops);
+            } catch (error) {
+                if (error.name === 'AbortError') return;
+                console.error('Haltestellen-Suche fehlgeschlagen:', error);
+                if (container) container.innerHTML = '<div class="suggestionHint">Suche fehlgeschlagen</div>';
+            }
+        }
+
+        function handleStopIdSearchInput(e) {
+            const query = e.target.value.trim().toLowerCase();
+            clearTimeout(stopSearchTimer);
+
+            if (query.length < 3) {
+                stopSearchController?.abort();
+                stopSearchController = null;
+                document.getElementById("stopIdsSearchSuggestions").innerHTML = '';
+                return;
+            }
+
+            stopSearchTimer = setTimeout(() => searchStopIds(query), STOP_SEARCH_DEBOUNCE_MS);
+        }
+
+        function handleStopIdSearchKeydown(e) {
+            if (e.key !== 'Enter') return;
+            e.preventDefault();
+            const first = document.querySelector('#stopIdsSearchSuggestions .suggestionItem');
+            if (first) addStopId(first.dataset.id, first.dataset.name);
         }
 
         function handleStopIdSuggestionClick(e) {
-            if (e.target.classList.contains('suggestionItem')) {
-                const id = e.target.dataset.id;
-                const name = e.target.dataset.name;
-                if (!stopIds.some(s => s.id === id)) {
-                    stopIds.push({ id, name });
-                    renderStopIdsTags();
-                }
-                document.getElementById('stopIdsSearchInput').value = '';
-                document.getElementById('stopIdsSearchSuggestions').innerHTML = '';
-            }
+            const item = e.target.closest('.suggestionItem');
+            if (!item) return;
+            addStopId(item.dataset.id, item.dataset.name);
         }
 
         function renderStopIdsTags() {
