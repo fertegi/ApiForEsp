@@ -35,7 +35,6 @@ function createDepartureEntry(departure) {
         console.log(`Could not parse time for departure: ${JSON.stringify(departure.when)}`);
         return null;
     }
-
     const delta = deltaFromNow(when);
     if (!Array.isArray(delta) || delta.length < 2) return null;
 
@@ -43,14 +42,14 @@ function createDepartureEntry(departure) {
     const totalMinutes = hours * 60 + minutes;
 
     if (totalMinutes < 0) return null;
-
     return {
         key: `${name}| ${destination} `,
         entry: {
             line: name,
             destination,
             departure_delta: totalMinutes,
-            departure_str: hours === 0 ? `${minutes} min` : `${hours}h ${minutes} min`
+            departure_str: hours === 0 ? `${minutes} min` : `${hours}h ${minutes} min`,
+            departure_ts: when.toUnixInteger()
         }
     };
 }
