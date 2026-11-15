@@ -10,6 +10,7 @@
     --text-color: #000000;
     --regular-border: 1px solid rgb(0, 0, 0);
     --bottom-border: 8px solid rgb(0, 0, 0);
+    --bottom-border-sm: 4px solid rgb(0, 0, 0);
     --border-color: black;
 }
 
@@ -203,6 +204,7 @@ body {
     padding: 2rem;
     width: 70%;
     margin: 2rem;
+    min-height: 100vh;
 }
 
 h1 {
@@ -235,6 +237,7 @@ p {
     text-decoration: none;
     text-align: center;
     transition: background 0.3s, transform 0.2s;
+
 }
 
 .btn:hover {
@@ -340,7 +343,6 @@ input[type="number"]:focus {
     padding: 1rem;
     border: var(--regular-border);
     border-bottom: var(--bottom-border) !important;
-
     border-radius: 16px;
 }
 
@@ -594,4 +596,59 @@ input[readonly] {
     .container>div>svg:first-child {
         width: 90% !important;
     }
+}
+
+/* --- Tabs --- */
+.tabbed>input[type="radio"] {
+    display: none;
+}
+
+.tabbed .nav {
+    display: flex;
+    gap: 0.25rem;
+    justify-content: space-evenly;
+}
+
+.tabbed .nav label {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    border: 1px solid transparent;
+    border-radius: 16px;
+    transition: border-color 150ms ease, background-color 150ms ease, color 150ms ease;
+    font-size: larger;
+    min-width: 40%;
+
+}
+
+menu {
+    margin: 10px;
+}
+
+.tabbed menu {
+    list-style: none;
+    padding: 1rem;
+}
+
+/* Standardmäßig alle Tab-Inhalte ausblenden */
+.tabbed menu>li {
+    display: none;
+}
+
+/* Aktiven Reiter hervorheben */
+#tab1:checked~.nav label[for="tab1"],
+#tab2:checked~.nav label[for="tab2"],
+#tab3:checked~.nav label[for="tab3"],
+#tab4:checked~.nav label[for="tab4"] {
+    border: var(--regular-border);
+    border-bottom: var(--bottom-border-sm) !important;
+    border-radius: 16px;
+
+}
+
+/* Passenden Inhalt zum aktiven Reiter einblenden */
+#tab1:checked~menu>li.tab1,
+#tab2:checked~menu>li.tab2,
+#tab3:checked~menu>li.tab3,
+#tab4:checked~menu>li.tab4 {
+    display: block;
 }
