@@ -157,7 +157,10 @@ app.get("/api/newsOfTheDay", async (req, res) => {
         if (config.error) {
             return res.status(500).json(config);
         }
-        const data = await getNewsOfTheDay(config.newsOfTheDay || {});
+        const data = await getNewsOfTheDay({
+            ...(config.newsOfTheDay || {}),
+            deviceId
+        });
         res.json(data);
 
     } catch (error) {
