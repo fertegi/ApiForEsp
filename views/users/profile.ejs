@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello <%= user.username %> - Smarta</title>
+    <title>smarta</title>
     <%- include('../partials/head-pwa') %>
     <link rel="stylesheet" href="/css/global.css">
 </head>
@@ -16,8 +16,27 @@
         <p>Willkommen beim ESP32 Your Watcher Manager.</p>
         <p>Hier hast du die Möglichkeit, deinen YourWatcher einzustellen. </p>
         <div>
-            <a href="/user/setDeviceConfiguration" class="btn">Geräte-Einstellungen</a>
-            <a href="/user/logout" class="btn">Abmelden</a>
+            <a href="/user/setDeviceConfiguration" class="btn btn-primary">Geräte-Einstellungen</a>
+            <a href="/user/logout" class="btn btn-secondary">Abmelden</a>
+        </div>
+
+        <div class="tabbed" style="padding-top:50px;">
+            <input checked="checked" id="tab1" type="radio" name="tabs">
+            <input id="tab2" type="radio" name="tabs">
+
+            <div class="nav">
+                <label for="tab1">📣 Angebote App</label>
+                <label for="tab2">📰 Nachrichten App</label>
+            </div>
+
+            <menu>
+                <li class="tab1">
+                    <%- include ("./partials/offers.ejs", {user:user,configurations:configurations,offers:offers,async:true});%>
+                </li>
+                <li class="tab2">
+                    <%- include ("./partials/newsOfTheDay.ejs", {user:user,configurations:configurations});%>
+                </li>
+            </menu>
         </div>
     </div>
 </body>

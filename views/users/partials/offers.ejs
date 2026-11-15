@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geräte-Konfiguration - Smarta</title>
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/apps.css">
+
+</head>
+
+<body>
+    <h1>Angebote <%= user.username %></h1>
+    <% configurations.forEach(function(item) { %>
+    <p value="<%= item.deviceId %>"><%= item.deviceId %></p>
+    <% }); %>
+    <% offers.Netto.forEach(function(offer) { %>
+    <a href="<%= offer.url %>" target="_blank"><%= offer.name %></a>
+    <% }); %>
+
+</body>
