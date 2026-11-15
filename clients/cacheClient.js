@@ -47,6 +47,24 @@ export async function getCached(key) {
     }
 }
 
+/** Gibt alle nicht abgelaufenen Cache-Werte zurück, deren String-Key dem MongoDB-Regex entspricht. */
+export async function getCachedByPattern(pattern) {
+    try {
+        const db = await getDatabase();
+        const cache = db.collection(CACHE_COLLECTION);
+
+        const docs = await cache.find({
+            _id: { $regex: pattern },
+            expiresAt: { $gt: new Date() }
+        }).toArray();
+
+        return docs.map(doc => doc.value);
+    } catch (error) {
+        console.error('Cache Pattern GET Fehler:', error);
+        return [];
+    }
+}
+
 export async function setCached(key, value, ttlSeconds = 300) {
     try {
         const db = await getDatabase();
