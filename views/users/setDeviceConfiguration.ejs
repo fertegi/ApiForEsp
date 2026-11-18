@@ -183,8 +183,8 @@
 
         // ==== Globale Variablen ====
         let stopIds = [];
-        const configurations = <% - typeof configurations !== 'undefined' ? JSON.stringify(configurations) : '[]' %>;
-        const deviceConfigSchema = <% - typeof deviceConfigSchema !== 'undefined' ? JSON.stringify(deviceConfigSchema) : '[]' %>;
+        const configurations = <%- typeof configurations !== 'undefined' ? JSON.stringify(configurations) : '[]' %>;
+        const deviceConfigSchema = <%- typeof deviceConfigSchema !== 'undefined' ? JSON.stringify(deviceConfigSchema) : '[]' %>;
 
         const STOP_SEARCH_DEBOUNCE_MS = 250;
         const stopSearchCache = new Map();

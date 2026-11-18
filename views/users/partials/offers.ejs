@@ -1,22 +1,65 @@
-<!DOCTYPE html>
-<html lang="de">
+<%
+    const offerGroups = Object.entries((offers && typeof offers === 'object') ? offers : {})
+        .filter(([, list]) => Array.isArray(list) && list.length > 0)
+        .sort(([a], [b]) => a.localeCompare(b, 'de'));
+    const totalOffers = offerGroups.reduce((sum, [, list]) => sum + list.length, 0);
+    const formatPrice = (value) => {
+        const num = Number(value);
+        return Number.isFinite(num) && num > 0
+            ? num.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'
+            : '';
+    };
+%>
+<section class="offers" aria-label="Angebote">
+    <header class="offers-header">
+        <h3>Angebote</h3>
+        <% if (totalOffers > 0) { %>
+        <span class="offers-total"><%= totalOffers %> Angebote bei <%= offerGroups.length %> Händlern</span>
+        <% } %>
+    </header>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Geräte-Konfiguration - Smarta</title>
-    <link rel="stylesheet" href="/css/global.css">
-    <link rel="stylesheet" href="/css/apps.css">
+    <% if (offerGroups.length === 0) { %>
+    <p class="offers-empty">Aktuell keine Angebote gefunden. Prüfe deine Suchbegriffe und Händler in der Konfiguration.
+    </p>
+    <% } %>
 
-</head>
-
-<body>
-    <h1>Angebote <%= user.username %></h1>
-    <% configurations.forEach(function(item) { %>
-    <p value="<%= item.deviceId %>"><%= item.deviceId %></p>
+    <% offerGroups.forEach(([retailer, list], groupIndex) => { %>
+    <details class="offer-group" <%= groupIndex === 0 ? 'open' : '' %>>
+        <summary class="offer-group-summary">
+            <span class="offer-retailer">
+                <span class="offer-retailer-initial" aria-hidden="true"><%= retailer.charAt(0).toUpperCase() %></span>
+                <span class="offer-retailer-name"><%= retailer %></span>
+            </span>
+            <span class="offer-count"><%= list.length %></span>
+            <span class="offer-chevron" aria-hidden="true"></span>
+        </summary>
+        <search></search>
+        <ul class="offer-grid">
+            <% list.forEach((offer, index) => { %>
+            <li class="offer-card" style="--i: <%= index %>">
+                <a class="offer-link" href="<%= offer.url %>" target="_blank" rel="noopener noreferrer">
+                    <% if (offer.img_url) { %>
+                    <span class="offer-image">
+                        <img src="<%= offer.img_url %>" alt="" width="96" height="96" loading="lazy" decoding="async"
+                            fetchpriority="low" onerror="this.closest('.offer-image').classList.add('is-broken')">
+                    </span>
+                    <% } else { %>
+                    <span class="offer-image is-broken"></span>
+                    <% } %>
+                    <span class="offer-body">
+                        <span class="offer-name"><%= offer.name %></span>
+                        <% if (offer.keyword) { %>
+                        <span class="offer-keyword"><%= offer.keyword %></span>
+                        <% } %>
+                        <% const price = formatPrice(offer.price); if (price) { %>
+                        <span class="offer-price"><%= price %></span>
+                        <% } %>
+                    </span>
+                </a>
+            </li>
+            <% }); %>
+        </ul>
+    </details>
     <% }); %>
-    <% offers.Netto.forEach(function(offer) { %>
-    <a href="<%= offer.url %>" target="_blank"><%= offer.name %></a>
-    <% }); %>
-
-</body>
+</section>
+<script src="/js/offers.js" defer></script>

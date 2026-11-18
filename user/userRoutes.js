@@ -2,8 +2,7 @@ import { getDeviceConfiguaration, updateDeviceConfiguration } from "../clients/m
 import { invalidateDeviceCache } from "../configLoader.js";
 import { getCoordinatesForZipCode } from "../services/zipCodeService.js";
 import { deviceConfigSchema } from "../deviceConfigSchema.js";
-import { getRenderItem } from "../views/users/partials/renderOffers.js";
-
+import { getOffersFromConfig } from "../services/marktguru.js";
 
 const TimeUtils = {
     MS_PER_SECOND: 1000,
@@ -185,7 +184,10 @@ export function setupUserRoutes(app) {
         }
 
         const configurations = await getUserConfigurations(user);
-        const offers = await getRenderItem("Offers", configurations[2].deviceId);
+
+        // const offers = await getItemsToRender(configurations[0]);
+        const { config } = configurations[0]
+        const offers = await getOffersFromConfig(config)
         res.render("users/profile", {
             user: user,
             status: "Top",
