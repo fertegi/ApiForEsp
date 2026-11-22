@@ -1,0 +1,15 @@
+meta {
+  name: Departures
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/departures
+  body: none
+  auth: none
+}
+
+headers {
+  x-device-id: {{deviceId}}
+}

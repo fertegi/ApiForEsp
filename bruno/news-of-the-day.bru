@@ -1,0 +1,13 @@
+meta {
+  name: News of the Day
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/api/newsOfTheDay
+}
+
+headers {
+  x-device-id: {{deviceId}}
+}

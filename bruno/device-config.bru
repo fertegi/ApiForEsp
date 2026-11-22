@@ -1,0 +1,13 @@
+meta {
+  name: Device Configuration
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/config/
+}
+
+headers {
+  x-device-id: {{deviceId}}
+}
