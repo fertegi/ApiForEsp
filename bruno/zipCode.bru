@@ -1,0 +1,14 @@
+meta {
+    name: Search StopIds
+    type: http
+    seq: 7
+}
+
+get {
+  url: {{baseUrl}}/utils/stopIdSearch/{{query}}
+
+}
+
+headers {
+  x-device-id: {{deviceId}}
+}

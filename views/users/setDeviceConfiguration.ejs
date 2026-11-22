@@ -4,15 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Geräte-Konfiguration - Smarta</title>
+    <title>Geräte-Konfiguration - smarta</title>
     <%- include('../partials/head-pwa') %>
     <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/pages.css">
 </head>
 <script src="/js/pwa.js" defer></script>
 
 <body>
-    <div class="container">
-        <div style="display:flex; margin-bottom:1rem; flex-direction:column; align-items: center;">
+    <main class="page-shell config-page">
+        <div class="config-wordmark" aria-hidden="true">
             <svg version="1.0" xmlns="http://www.w3.org/2000/svg" style="width:70%;" width="390.000000pt"
                 height="137.000000pt" viewBox="0 0 780.000000 274.000000" preserveAspectRatio="xMidYMid meet">
                 <g transform="translate(0.000000,274.000000) scale(0.100000,-0.100000)" fill="#000000" stroke="none">
@@ -35,8 +36,13 @@
             </svg>
 
         </div>
-        <h1>Geräte-Konfiguration</h1>
-        <p>Hallo <%= user.username %>! Hier kannst du deinen YourWatcher konfigurieren.</p>
+        <header class="page-heading app-page-header">
+            <div class="page-heading-copy">
+                <h1>Geräte-Konfiguration</h1>
+                <p>Hallo <%= user.username %>! Hier kannst du deinen smarta konfigurieren.</p>
+            </div>
+            <a href="/user/profile" class="back-link">← Zum Profil</a>
+        </header>
 
         <% if (flash) { %>
         <div class="flash-message flash-<%= flash.type %>">
@@ -50,9 +56,8 @@
 
                 <!-- Geräte-Auswahl -->
                 <div class="form-section">
-                    <h3 id="device-selection">📱 Gerät auswählen</h3>
+                    <h3 id="device-selection">smarta auswählen</h3>
                     <div class="form-group">
-                        <label for="deviceSelect">Gerät:</label>
                         <select name="deviceId" id="deviceSelect" onchange="loadConfig(this.value)">
                             <option value="" selected disabled>Bitte Gerät auswählen</option>
                             <% configurations.forEach(function(item) { %>
@@ -63,9 +68,7 @@
                 </div>
 
                 <!-- Dynamisches Rendering: Basic Felder -->
-                <div id="categories-container">
-                    <div id="basic-fields"></div>
-                </div>
+                <div id="basic-fields"></div>
                 <details class="form-section">
                     <summary>
                         <h3>🔧 Erweiterte Einstellungen</h3>
@@ -141,11 +144,11 @@
                 </svg>
                 <div class="button-group">
                     <button type="submit" class="btn btn-primary">💾 Speichern</button>
-                    <a href="/user/profile" class="btn btn-secondary">Zurück</a>
+                    <a href="/user/profile" class="btn btn-secondary">Zurück zum Profil</a>
                 </div>
             </form>
         </div>
-    </div>
+    </main>
 
     <script>
         // ==== Konstanten & Hilfsfunktionen ====
@@ -182,6 +185,7 @@
         }
 
         // ==== Globale Variablen ====
+
         let stopIds = [];
         const configurations = <%- typeof configurations !== 'undefined' ? JSON.stringify(configurations) : '[]' %>;
         const deviceConfigSchema = <%- typeof deviceConfigSchema !== 'undefined' ? JSON.stringify(deviceConfigSchema) : '[]' %>;
@@ -463,7 +467,7 @@
                     el.value = value ?? '';
                 }
             });
-            document.getElementById('device-selection').innerHTML = deviceId ? `📱 Gerät: ${deviceId}` : '📱 Gerät auswählen';
+            document.getElementById('device-selection').innerHTML = deviceId ? ` Gerät: ${deviceId}` : 'Gerät auswählen';
         }
 
         // ==== Initialisierung ====

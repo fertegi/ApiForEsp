@@ -1,7 +1,7 @@
 {
-  "name": "Smarta",
-  "short_name": "Smarta",
-  "description": "YourWatcher Konfiguration & Dashboard",
+  "name": "smarta",
+  "short_name": "smarta",
+  "description": "smarta Konfiguration & Dashboard",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
