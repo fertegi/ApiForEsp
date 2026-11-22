@@ -14,66 +14,65 @@
     };
 %>
 <section class="feed" aria-label="Angebote">
-    <header class="feed-header">
-        <h3>Angebote</h3>
-        <% if (totalOffers > 0) { %>
-        <span class="feed-total"><%= totalOffers %> Angebote bei <%= offerGroups.length %> Händlern</span>
-        <% } %>
-    </header>
-
-    <% if (offerKeywords.length > 0) { %>
-    <div class="feed-keywords" aria-label="Konfigurierte Angebotssuchbegriffe">
-        <span class="feed-keywords-label">Suchbegriffe:</span>
-        <ul class="chip-list">
-            <% offerKeywords.forEach((keyword) => { %>
-            <li class="chip"><%= keyword %></li>
-            <% }); %>
-        </ul>
-    </div>
+  <header class="feed-header">
+    <h3>Angebote</h3>
+    <% if (totalOffers > 0) { %>
+    <span class="feed-total"><%= totalOffers %> Angebote bei <%= offerGroups.length %> Händlern</span>
     <% } %>
+  </header>
 
-    <% if (offerGroups.length === 0) { %>
-    <p class="feed-empty">Aktuell keine Angebote gefunden. Prüfe deine Suchbegriffe und Händler in der Konfiguration.
-    </p>
-    <% } %>
+  <% if (offerKeywords.length > 0) { %>
+  <div class="feed-keywords" aria-label="Konfigurierte Angebotssuchbegriffe">
+    <span class="feed-keywords-label">Suchbegriffe:</span>
+    <ul class="chip-list">
+      <% offerKeywords.forEach((keyword) => { %>
+      <li class="chip"><%= keyword %></li>
+      <% }); %>
+    </ul>
+  </div>
+  <% } %>
 
-    <% offerGroups.forEach(([retailer, list], groupIndex) => { %>
-    <details class="feed-group" >
-        <summary class="feed-group-summary">
-            <span class="feed-group-title">
-                <span class="avatar" aria-hidden="true"><%= retailer.charAt(0).toUpperCase() %></span>
-                <span class="feed-group-name"><%= retailer %></span>
-            </span>
-            <span class="chip"><%= list.length %></span>
-            <span class="chevron" aria-hidden="true"></span>
-        </summary>
-        <search></search>
-        <ul class="card-grid">
-            <% list.forEach((offer, index) => { %>
-            <li class="card" style="--i: <%= index %>">
-                <a class="card-link" href="<%= offer.url %>" target="_blank" rel="noopener noreferrer">
-                    <% if (offer.img_url) { %>
-                    <span class="card-image">
-                        <img src="<%= offer.img_url %>" alt="" width="96" height="96" loading="lazy" decoding="async"
-                            fetchpriority="low" onerror="this.closest('.card-image').classList.add('is-broken')">
-                    </span>
-                    <% } else { %>
-                    <span class="card-image is-broken"></span>
-                    <% } %>
-                    <span class="card-body">
-                        <span class="card-title"><%= offer.name %></span>
-                        <% if (offer.keyword) { %>
-                        <span class="card-subtext"><%= offer.keyword %></span>
-                        <% } %>
-                        <% const price = formatPrice(offer.price); if (price) { %>
-                        <span class="accent"><%= price %></span>
-                        <% } %>
-                    </span>
-                </a>
-            </li>
-            <% }); %>
-        </ul>
-    </details>
-    <% }); %>
+  <% if (offerGroups.length === 0) { %>
+  <p class="feed-empty">Aktuell keine Angebote gefunden. Prüfe deine Suchbegriffe und Händler in der Konfiguration.
+  </p>
+  <% } %>
+
+  <% offerGroups.forEach(([retailer, list], groupIndex) => { %>
+  <details class="feed-group">
+    <summary class="feed-group-summary">
+      <span class="feed-group-title">
+        <span class="avatar" aria-hidden="true"><%= retailer.charAt(0).toUpperCase() %></span>
+        <span class="feed-group-name"><%= retailer %></span>
+      </span>
+      <span class="chip"><%= list.length %></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <search></search>
+    <ul class="card-grid">
+      <% list.forEach((offer, index) => { %>
+      <li class="card" style="--i: <%= index %>">
+        <a class="card-link" href="<%= offer.url %>" target="_blank" rel="noopener noreferrer">
+          <% if (offer.img_url) { %>
+          <span class="card-image">
+            <img src="<%= offer.img_url %>" alt="" width="96" height="96" loading="lazy" decoding="async" fetchpriority="low" onerror="this.closest('.card-image').classList.add('is-broken')">
+          </span>
+          <% } else { %>
+          <span class="card-image is-broken"></span>
+          <% } %>
+          <span class="card-body">
+            <span class="card-title"><%= offer.name %></span>
+            <% if (offer.keyword) { %>
+            <span class="card-subtext"><%= offer.description %></span>
+            <% } %>
+            <% const price = formatPrice(offer.price); if (price) { %>
+            <span class="accent"><%= price %></span>
+            <% } %>
+          </span>
+        </a>
+      </li>
+      <% }); %>
+    </ul>
+  </details>
+  <% }); %>
 </section>
 <script src="/js/offers.js" defer></script>
