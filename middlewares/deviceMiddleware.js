@@ -2,16 +2,34 @@ import { getCached, setCached } from "../clients/cacheClient.js";
 import { getDatabase } from "../clients/mongoClient.js";
 import { loadConfig } from "../configLoader.js";
 
-export function requireRegisteredDevice(req, res, next) {
-  const deviceId =
-    req.params.deviceId || req.headers["x-device-id"] || req.query.deviceId;
+export function getDeviceId(req) {
+  const candidates = [
+    req.params?.deviceId,
+    req.headers["x-device-id"],
+    req.query?.deviceId,
+  ];
 
-  if (!deviceId) {
-    return res.status(400).json({
-      error:
-        "Device ID fehlt. Bitte als URL-Parameter, Query-Parameter oder Header 'x-device-id' senden.",
-    });
+  const deviceId = candidates.find(
+    (value) => typeof value === "string" && value.trim(),
+  );
+
+  return typeof deviceId === "string" ? deviceId.trim() : undefined;
+}
+
+function rejectMissingOrDefaultDevice(req, res) {
+  const deviceId = getDeviceId(req);
+
+  if (!deviceId || deviceId === "defaultDevice") {
+    res.status(400).json({ error: "Geräte-ID ist erforderlich." });
+    return undefined;
   }
+
+  return deviceId;
+}
+
+export function requireRegisteredDevice(req, res, next) {
+  const deviceId = rejectMissingOrDefaultDevice(req, res);
+  if (!deviceId) return;
 
   isDeviceRegistered(deviceId)
     .then((isRegistered) => {
@@ -61,14 +79,8 @@ export async function isDeviceRegistered(deviceId) {
 }
 
 export function requireRegisteredDeviceWithConfig(req, res, next) {
-  const deviceId =
-    req.params.deviceId || req.headers["x-device-id"] || req.query.deviceId;
-
-  if (!deviceId) {
-    return res.status(400).json({
-      error: "Device ID fehlt",
-    });
-  }
+  const deviceId = rejectMissingOrDefaultDevice(req, res);
+  if (!deviceId) return;
 
   loadConfig(deviceId)
     .then((config) => {

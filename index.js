@@ -68,22 +68,13 @@ app.get("/health", async (req, res) => {
 });
 
 app.get("/api/config/", async (req, res) => {
-  const { deviceId, config } = req;
-  if (!deviceId || deviceId === "defaultDevice") {
-    return res.status(400).json({ error: "Geräte-ID ist erforderlich." });
-  }
+  const { config } = req;
   res.json(config.deviceConfiguration || {});
 });
 
 app.get("/api/offers", async (req, res) => {
   try {
-    const { deviceId, config } = req;
-    if (!deviceId || deviceId === "defaultDevice") {
-      return res.status(400).json({ error: "Geräte-ID ist erforderlich." });
-    }
-    if (config.error) {
-      return res.status(500).json(config);
-    }
+    const { config } = req;
     const offers = await getOffersFromConfig(config);
     if (!offers || offers.length === 0) {
       return res
@@ -99,13 +90,7 @@ app.get("/api/offers", async (req, res) => {
 
 app.get("/api/departures", async (req, res) => {
   try {
-    const { deviceId, config } = req;
-    if (!deviceId) {
-      return res.status(400).json({ error: "Geräte-ID ist erforderlich." });
-    }
-    if (config.error) {
-      return res.status(500).json(config);
-    }
+    const { config } = req;
     const departures = await getAllDepartures(config);
     if (!departures || departures.length === 0) {
       return res.status(404).json({ message: "Keine Abfahrten gefunden." });
@@ -119,13 +104,7 @@ app.get("/api/departures", async (req, res) => {
 
 app.get("/api/weather", async (req, res) => {
   try {
-    const { deviceId, config } = req;
-    if (!deviceId) {
-      return res.status(400).json({ error: "Geräte-ID ist erforderlich." });
-    }
-    if (config.error) {
-      return res.status(500).json(config);
-    }
+    const { config } = req;
 
     const nextWeatherData = await getWeatherData(config);
     res.json(nextWeatherData);
@@ -137,13 +116,6 @@ app.get("/api/weather", async (req, res) => {
 
 app.get("/api/quoteOfTheDay", async (req, res) => {
   try {
-    const { deviceId, config } = req;
-    if (!deviceId) {
-      return res.status(400).json({ error: "Geräte-ID ist erforderlich." });
-    }
-    if (config.error) {
-      return res.status(500).json(config);
-    }
     // we expecting an array with one element
     const data = await getQuoteOfTheDay();
     const quoteOfTheDayData = data[0];
@@ -157,12 +129,6 @@ app.get("/api/quoteOfTheDay", async (req, res) => {
 app.get("/api/newsOfTheDay", async (req, res) => {
   try {
     const { deviceId, config } = req;
-    if (!deviceId) {
-      return res.status(400).json({ error: "Geräte-ID ist erforderlich." });
-    }
-    if (config.error) {
-      return res.status(500).json(config);
-    }
     const data = await getNewsOfTheDay({
       ...(config.newsOfTheDay || {}),
       deviceId,
