@@ -4,22 +4,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello <%= user.username %> - Smarta</title>
+    <title>smarta</title>
     <%- include('../partials/head-pwa') %>
     <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/apps.css">
 </head>
 <script src="/js/pwa.js" defer></script>
 
 <body>
-    <div class="container">
-        <h1>Hello <%= user.username %>!</h1>
-        <p>Willkommen beim ESP32 Your Watcher Manager.</p>
-        <p>Hier hast du die Möglichkeit, deinen YourWatcher einzustellen. </p>
-        <div>
-            <a href="/user/setDeviceConfiguration" class="btn">Geräte-Einstellungen</a>
-            <a href="/user/logout" class="btn">Abmelden</a>
+    <main class="container profile-page">
+        <header class="profile-header">
+            <h1>Hello <%= user.username %>!</h1>
+            <p>Willkommen beim ESP32 Your Watcher Manager.</p>
+            <p>Hier hast du die Möglichkeit, deinen YourWatcher einzustellen.</p>
+        </header>
+        <div class="profile-actions">
+            <a href="/user/setDeviceConfiguration" class="btn btn-primary">Geräte-Einstellungen</a>
+            <a href="/user/logout" class="btn btn-secondary">Abmelden</a>
         </div>
-    </div>
+
+        <div class="tabbed profile-tabs">
+            <input checked="checked" id="tab1" type="radio" name="tabs">
+            <input id="tab2" type="radio" name="tabs">
+
+            <div class="nav profile-nav">
+                <label for="tab1">📣 Angebote App</label>
+                <label for="tab2">📰 Nachrichten App</label>
+            </div>
+
+            <menu>
+                <li class="tab1">
+                    <%- include ("./partials/offers.ejs", {user:user,configurations:configurations,offers:offers,async:true});%>
+                </li>
+                <li class="tab2">
+                    <%- include ("./partials/newsOfTheDay.ejs", {user:user,configurations:configurations,newsOfTheDay:newsOfTheDay,async:true});%>
+                </li>
+            </menu>
+        </div>
+    </main>
 </body>
 
 </html>

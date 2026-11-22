@@ -145,10 +145,6 @@
                 </div>
             </form>
         </div>
-
-        <div style="margin-top: 1.5rem; text-align: center;">
-            <a href="/user/logout" class="btn btn-danger">Abmelden</a>
-        </div>
     </div>
 
     <script>
@@ -187,8 +183,8 @@
 
         // ==== Globale Variablen ====
         let stopIds = [];
-        const configurations = <%- JSON.stringify(configurations) %> || [];
-        const deviceConfigSchema = <%- JSON.stringify(deviceConfigSchema) %>;
+        const configurations = <%- typeof configurations !== 'undefined' ? JSON.stringify(configurations) : '[]' %>;
+        const deviceConfigSchema = <%- typeof deviceConfigSchema !== 'undefined' ? JSON.stringify(deviceConfigSchema) : '[]' %>;
 
         const STOP_SEARCH_DEBOUNCE_MS = 250;
         const stopSearchCache = new Map();

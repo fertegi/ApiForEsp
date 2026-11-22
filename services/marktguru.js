@@ -103,10 +103,12 @@ export async function searchByConfig(config) {
                 retailer,
                 description,
                 keyword: query,
-                url: `${apiUrls.marktGuruBaseUrl}/offers/${result.id}`
+                url: `${apiUrls.marktGuruBaseUrl}/offers/${result.id}`,
+                img_url: `https://cdn.marktguru.de/api/v1/offers/${result.id}/images/default/0/small.webp`
             });
         }
     }
+
     return response;
 }
 

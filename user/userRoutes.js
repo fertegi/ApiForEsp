@@ -2,7 +2,8 @@ import { getDeviceConfiguaration, updateDeviceConfiguration } from "../clients/m
 import { invalidateDeviceCache } from "../configLoader.js";
 import { getCoordinatesForZipCode } from "../services/zipCodeService.js";
 import { deviceConfigSchema } from "../deviceConfigSchema.js";
-
+import { getOffersFromConfig } from "../services/marktguru.js";
+import { getNewsOfTheDay } from "../services/newsOfTheDay.js";
 
 const TimeUtils = {
     MS_PER_SECOND: 1000,
@@ -72,22 +73,18 @@ function validateIntervals(intervals) {
 
 export function setupUserRoutes(app) {
 
+    const getUserConfigurations = async (user) => {
+        const deviceIds = user.belongs || [];
+        return Promise.all(deviceIds.map(async (deviceId) => ({
+            deviceId,
+            config: await getDeviceConfiguaration(deviceId)
+        })));
+    };
+
     app.get("/user", (req, res) => {
         res.send("User endpoint is working");
     });
 
-    app.get("/user/profile", (req, res) => {
-        const user = req.user;
-
-        if (!user) {
-            return res.redirect('/user/login');
-        }
-
-        res.render("users/profile", {
-            user: user,
-            status: "Top"
-        });
-    });
 
     // Schema für dynamische Felder importieren
     app.get("/user/setDeviceConfiguration", async (req, res) => {
@@ -97,17 +94,7 @@ export function setupUserRoutes(app) {
             return res.redirect('/user/login');
         }
 
-        // Sicherstellen, dass belongs ein Array ist
-        const deviceIds = user.belongs || [];
-
-        const deviceConfigurations = deviceIds.map(async (deviceId) => {
-            const config = await getDeviceConfiguaration(deviceId);
-            return {
-                deviceId,
-                config
-            };
-        });
-        const configurations = await Promise.all(deviceConfigurations);
+        const configurations = await getUserConfigurations(user);
 
         // Flash-Message aus Cookie lesen und löschen
         const flashMessage = req.cookies.flash;
@@ -190,4 +177,24 @@ export function setupUserRoutes(app) {
         }
     });
 
+    app.get("/user/profile", async (req, res) => {
+        const user = req.user;
+
+        if (!user) {
+            return res.redirect('/user/login');
+        }
+
+        const configurations = await getUserConfigurations(user);
+
+        const { config } = configurations[0]
+        const offers = await getOffersFromConfig(config)
+        const newsOfTheDay = await getNewsOfTheDay(config.newsOfTheDay || {})
+        res.render("users/profile", {
+            user: user,
+            status: "Top",
+            configurations,
+            offers,
+            newsOfTheDay
+        });
+    });
 }

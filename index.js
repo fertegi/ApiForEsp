@@ -55,8 +55,15 @@ app.get("/", (req, res) => {
     res.redirect("/user/login");
 });
 
-app.get("/api", (req, res) => {
-    res.send("API is working");
+app.get("/health", async (req, res) => {
+    const cacheHealthy = await isCacheHealthy();
+
+    res.set("Cache-Control", "no-store")
+        .status(cacheHealthy ? 200 : 503)
+        .json({
+            status: cacheHealthy ? "ok" : "unhealthy",
+            cache: cacheHealthy
+        });
 });
 
 app.get('/api/config/', async (req, res) => {
@@ -157,7 +164,10 @@ app.get("/api/newsOfTheDay", async (req, res) => {
         if (config.error) {
             return res.status(500).json(config);
         }
-        const data = await getNewsOfTheDay(config.newsOfTheDay || {});
+        const data = await getNewsOfTheDay({
+            ...(config.newsOfTheDay || {}),
+            deviceId
+        });
         res.json(data);
 
     } catch (error) {

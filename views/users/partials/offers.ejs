@@ -1,0 +1,79 @@
+<%
+    const offerKeywords = Array.isArray(configurations?.[0]?.config?.offers?.searchKeywords)
+        ? configurations[0].config.offers.searchKeywords.filter((keyword) => typeof keyword === 'string' && keyword.trim())
+        : [];
+    const offerGroups = Object.entries((offers && typeof offers === 'object') ? offers : {})
+        .filter(([, list]) => Array.isArray(list) && list.length > 0)
+        .sort(([a], [b]) => a.localeCompare(b, 'de'));
+    const totalOffers = offerGroups.reduce((sum, [, list]) => sum + list.length, 0);
+    const formatPrice = (value) => {
+        const num = Number(value);
+        return Number.isFinite(num) && num > 0
+            ? num.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'
+            : '';
+    };
+%>
+<section class="feed" aria-label="Angebote">
+    <header class="feed-header">
+        <h3>Angebote</h3>
+        <% if (totalOffers > 0) { %>
+        <span class="feed-total"><%= totalOffers %> Angebote bei <%= offerGroups.length %> Händlern</span>
+        <% } %>
+    </header>
+
+    <% if (offerKeywords.length > 0) { %>
+    <div class="feed-keywords" aria-label="Konfigurierte Angebotssuchbegriffe">
+        <span class="feed-keywords-label">Suchbegriffe:</span>
+        <ul class="chip-list">
+            <% offerKeywords.forEach((keyword) => { %>
+            <li class="chip"><%= keyword %></li>
+            <% }); %>
+        </ul>
+    </div>
+    <% } %>
+
+    <% if (offerGroups.length === 0) { %>
+    <p class="feed-empty">Aktuell keine Angebote gefunden. Prüfe deine Suchbegriffe und Händler in der Konfiguration.
+    </p>
+    <% } %>
+
+    <% offerGroups.forEach(([retailer, list], groupIndex) => { %>
+    <details class="feed-group" >
+        <summary class="feed-group-summary">
+            <span class="feed-group-title">
+                <span class="avatar" aria-hidden="true"><%= retailer.charAt(0).toUpperCase() %></span>
+                <span class="feed-group-name"><%= retailer %></span>
+            </span>
+            <span class="chip"><%= list.length %></span>
+            <span class="chevron" aria-hidden="true"></span>
+        </summary>
+        <search></search>
+        <ul class="card-grid">
+            <% list.forEach((offer, index) => { %>
+            <li class="card" style="--i: <%= index %>">
+                <a class="card-link" href="<%= offer.url %>" target="_blank" rel="noopener noreferrer">
+                    <% if (offer.img_url) { %>
+                    <span class="card-image">
+                        <img src="<%= offer.img_url %>" alt="" width="96" height="96" loading="lazy" decoding="async"
+                            fetchpriority="low" onerror="this.closest('.card-image').classList.add('is-broken')">
+                    </span>
+                    <% } else { %>
+                    <span class="card-image is-broken"></span>
+                    <% } %>
+                    <span class="card-body">
+                        <span class="card-title"><%= offer.name %></span>
+                        <% if (offer.keyword) { %>
+                        <span class="card-subtext"><%= offer.keyword %></span>
+                        <% } %>
+                        <% const price = formatPrice(offer.price); if (price) { %>
+                        <span class="accent"><%= price %></span>
+                        <% } %>
+                    </span>
+                </a>
+            </li>
+            <% }); %>
+        </ul>
+    </details>
+    <% }); %>
+</section>
+<script src="/js/offers.js" defer></script>
