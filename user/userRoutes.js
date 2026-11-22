@@ -228,7 +228,7 @@ export function setupUserRoutes(app) {
 
     const { config } = configurations[0];
     const offers = await getOffersFromConfig(config);
-    const newsOfTheDay = await getNewsOfTheDay(config.newsOfTheDay || {});
+    const newsOfTheDay = await getNewsOfTheDay(config);
     res.render("users/profile", {
       user: user,
       status: "Top",
