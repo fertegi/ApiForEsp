@@ -50,13 +50,18 @@
             <div class="offer-link news-link">
             <% } %>
                 <span class="offer-body">
-                    <span class="offer-name"><%= item.title %></span>
-                    <% if (item.creator) { %>
-                    <span class="news-publisher"><%= item.creator %></span>
+                    <span class="offer-name offer-price"><%= item.title %></span>
+                    <% if (item.description) { %>
+                    <span class="news-description"><%= item.description %></span>
                     <% } %>
-                    <% if (item.pubDate) { %>
-                    <time class="news-date"><%= formatNewsDate(item.pubDate) %></time>
-                    <% } %>
+                    <span class="news-meta">
+                        <% if (item.pubDate) { %>
+                        <time class="news-date"><%= formatNewsDate(item.pubDate) %></time>
+                        <% } %>
+                        <% if (item.creator) { %>
+                        <span class="news-publisher"><%= item.creator %></span>
+                        <% } %>
+                    </span>
                 </span>
             <% if (hasSafeUrl) { %>
             </a>
