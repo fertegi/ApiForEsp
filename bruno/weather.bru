@@ -1,0 +1,13 @@
+meta {
+  name: Weather
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/weather
+}
+
+headers {
+  x-device-id: {{deviceId}}
+}

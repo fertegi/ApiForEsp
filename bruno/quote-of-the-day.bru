@@ -1,0 +1,13 @@
+meta {
+  name: Quote of the Day
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/api/quoteOfTheDay
+}
+
+headers {
+  x-device-id: {{deviceId}}
+}
