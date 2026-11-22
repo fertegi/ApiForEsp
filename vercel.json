@@ -24,6 +24,18 @@
             "dest": "/index.js"
         },
         {
+            "src": "/manifest\\.json",
+            "dest": "/public/manifest.json"
+        },
+        {
+            "src": "/js/(.*)",
+            "dest": "/public/js/$1"
+        },
+        {
+            "src": "/icons/(.*)",
+            "dest": "/public/icons/$1"
+        },
+        {
             "src": "/css/(.*)",
             "dest": "/public/css/$1"
         },
