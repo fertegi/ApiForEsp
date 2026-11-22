@@ -268,8 +268,7 @@ input[readonly] {
   }
 
   .tooltip-text {
-    right: auto;
-    left: 0;
+    right: 0;
     width: min(220px, 80vw);
   }
 }
