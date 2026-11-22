@@ -8,13 +8,16 @@
         {
             "src": "public/**",
             "use": "@vercel/static"
+        },
+        {
+            "src": "index.js",
+            "use": "@vercel/node",
+            "config": {
+                "includeFiles": "views/**"
+            }
         }
     ],
     "routes": [
-        {
-            "src": "/health",
-            "dest": "/index.js"
-        },
         {
             "src": "/api/(.*)",
             "dest": "/index.js"
@@ -26,6 +29,18 @@
         {
             "src": "/utils/(.*)",
             "dest": "/index.js"
+        },
+        {
+            "src": "/manifest\\.json",
+            "dest": "/public/manifest.json"
+        },
+        {
+            "src": "/js/(.*)",
+            "dest": "/public/js/$1"
+        },
+        {
+            "src": "/icons/(.*)",
+            "dest": "/public/icons/$1"
         },
         {
             "src": "/css/(.*)",
