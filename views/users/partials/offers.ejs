@@ -24,7 +24,7 @@
     <% } %>
 
     <% offerGroups.forEach(([retailer, list], groupIndex) => { %>
-    <details class="offer-group" <%= groupIndex === 0 ? 'open' : '' %>>
+    <details class="offer-group" >
         <summary class="offer-group-summary">
             <span class="offer-retailer">
                 <span class="offer-retailer-initial" aria-hidden="true"><%= retailer.charAt(0).toUpperCase() %></span>
