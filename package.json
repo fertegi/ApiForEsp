@@ -25,7 +25,8 @@
     "rss-parser": "^3.13.0"
   },
   "devDependencies": {
-    "dotenv": "^17.2.3"
+    "dotenv": "^17.2.3",
+    "prettier": "^3.10.1"
   },
   "type": "module"
 }

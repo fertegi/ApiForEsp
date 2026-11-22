@@ -2,49 +2,49 @@
 <html lang="de">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>smarta</title>
-    <%- include('../partials/head-pwa') %>
-    <link rel="stylesheet" href="/css/global.css">
-    <link rel="stylesheet" href="/css/pages.css">
-    <link rel="stylesheet" href="/css/apps.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>smarta</title>
+  <%- include('../partials/head-pwa') %>
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/pages.css">
+  <link rel="stylesheet" href="/css/apps.css">
 </head>
 <script src="/js/pwa.js" defer></script>
 
 <body>
-    <main class="page-shell profile-page">
-        <header class="page-heading app-page-header profile-header">
-            <div class="page-heading-copy">
-                <h1>Hallo <%= user.username %>!</h1>
-                <p>Willkommen bei deinem smarta-Manager.</p>
-                <p>Hier hast du die Möglichkeit, deinen smarta einzustellen.</p>
-            </div>
-        </header>
-        <div class="profile-actions">
-            <a href="/user/setDeviceConfiguration" class="btn btn-primary">Geräte-Einstellungen</a>
-            <a href="/user/logout" class="btn btn-secondary">Abmelden</a>
-        </div>
+  <main class="page-shell profile-page">
+    <header class="page-heading app-page-header profile-header">
+      <div class="page-heading-copy">
+        <h1>Hallo <%= user.username %>!</h1>
+        <p>Willkommen bei deinem smarta-Manager.</p>
+        <p>Hier hast du die Möglichkeit, deinen smarta einzustellen.</p>
+      </div>
+    </header>
+    <div class="profile-actions">
+      <a href="/user/setDeviceConfiguration" class="btn btn-primary">Geräte-Einstellungen</a>
+      <a href="/user/logout" class="btn btn-secondary">Abmelden</a>
+    </div>
 
-        <div class="profile-tabs">
-            <input checked="checked" id="tab1" type="radio" name="tabs">
-            <input id="tab2" type="radio" name="tabs">
+    <div class="profile-tabs">
+      <input checked="checked" id="tab1" type="radio" name="tabs">
+      <input id="tab2" type="radio" name="tabs">
 
-            <div class="nav">
-                <label for="tab1">Angebote App</label>
-                <label for="tab2">Nachrichten App</label>
-            </div>
+      <div class="nav">
+        <label for="tab1">Angebote App</label>
+        <label for="tab2">Nachrichten App</label>
+      </div>
 
-            <menu>
-                <li class="tab1">
-                    <%- include ("./partials/offers.ejs", {user:user,configurations:configurations,offers:offers,async:true});%>
-                </li>
-                <li class="tab2">
-                    <%- include ("./partials/newsOfTheDay.ejs", {user:user,configurations:configurations,newsOfTheDay:newsOfTheDay,async:true});%>
-                </li>
-            </menu>
-        </div>
-    </main>
+      <menu>
+        <li class="tab1">
+          <%- include ("./partials/offers.ejs", {user:user,configurations:configurations,offers:offers,async:true});%>
+        </li>
+        <li class="tab2">
+          <%- include ("./partials/newsOfTheDay.ejs", {user:user,configurations:configurations,newsOfTheDay:newsOfTheDay,async:true});%>
+        </li>
+      </menu>
+    </div>
+  </main>
 </body>
 
 </html>

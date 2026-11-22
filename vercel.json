@@ -1,50 +1,50 @@
 {
-    "version": 2,
-    "builds": [
-        {
-            "src": "index.js",
-            "use": "@vercel/node",
-            "config": {
-                "includeFiles": "views/**"
-            }
-        },
-        {
-            "src": "public/**",
-            "use": "@vercel/static"
-        }
-    ],
-    "routes": [
-        {
-            "src": "/api/(.*)",
-            "dest": "/index.js"
-        },
-        {
-            "src": "/user/(.*)",
-            "dest": "/index.js"
-        },
-        {
-            "src": "/utils/(.*)",
-            "dest": "/index.js"
-        },
-        {
-            "src": "/manifest\\.json",
-            "dest": "/public/manifest.json"
-        },
-        {
-            "src": "/js/(.*)",
-            "dest": "/public/js/$1"
-        },
-        {
-            "src": "/icons/(.*)",
-            "dest": "/public/icons/$1"
-        },
-        {
-            "src": "/css/(.*)",
-            "dest": "/public/css/$1"
-        },
-        {
-            "src": "/public/(.*)",
-            "dest": "/public/$1"
-        }
-    ]
+  "version": 2,
+  "builds": [
+    {
+      "src": "index.js",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": "views/**"
+      }
+    },
+    {
+      "src": "public/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/index.js"
+    },
+    {
+      "src": "/user/(.*)",
+      "dest": "/index.js"
+    },
+    {
+      "src": "/utils/(.*)",
+      "dest": "/index.js"
+    },
+    {
+      "src": "/manifest\\.json",
+      "dest": "/public/manifest.json"
+    },
+    {
+      "src": "/js/(.*)",
+      "dest": "/public/js/$1"
+    },
+    {
+      "src": "/icons/(.*)",
+      "dest": "/public/icons/$1"
+    },
+    {
+      "src": "/css/(.*)",
+      "dest": "/public/css/$1"
+    },
+    {
+      "src": "/public/(.*)",
+      "dest": "/public/$1"
+    }
+  ]
 }

@@ -1,7 +1,7 @@
-const button = document.createElement('button');
-button.type = 'button';
-button.className = 'back-to-top';
-button.setAttribute('aria-label', 'Zurück nach oben');
+const button = document.createElement("button");
+button.type = "button";
+button.className = "back-to-top";
+button.setAttribute("aria-label", "Zurück nach oben");
 button.hidden = true;
 
 button.innerHTML = `
@@ -12,15 +12,15 @@ button.innerHTML = `
 document.body.appendChild(button);
 
 const updateVisibility = () => {
-    button.hidden = window.scrollY <= 200;
+  button.hidden = window.scrollY <= 200;
 };
 
-window.addEventListener('scroll', updateVisibility, { passive: true });
-button.addEventListener('click', () => {
-    const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-        ? 'auto'
-        : 'smooth';
-    window.scrollTo({ top: 0, behavior });
+window.addEventListener("scroll", updateVisibility, { passive: true });
+button.addEventListener("click", () => {
+  const behavior = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ? "auto"
+    : "smooth";
+  window.scrollTo({ top: 0, behavior });
 });
 
 updateVisibility();
