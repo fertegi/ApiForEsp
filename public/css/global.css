@@ -1,31 +1,19 @@
 :root {
     --btn-color: #ca366f;
-    --dark-color: #0d47a1;
-    --light-color: #bbdefb;
-    --danger-color: #f44336;
-    --success-color: #4caf50;
-    --gray-color: #f5f5f5;
-    --border-color: #000000;
-    --background-color: rgb(255, 255, 255);
-    --text-color: #000000;
-    --regular-border: 1px solid rgb(0, 0, 0);
-    --bottom-border: 8px solid rgb(0, 0, 0);
-    --bottom-border-sm: 4px solid rgb(0, 0, 0);
-    --border-color: black;
+    --dark-color: #762646;
+    --gray-color: #f4eef0;
+    --border-color: #e8dce1;
+    --background-color: #f7f4f2;
+    --text-color: #28232a;
+    --regular-border: 1px solid var(--border-color);
 }
 
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    background-color: var(--background-color);
 }
 
-/* details summary::-webkit-details-marker {
-    padding-left: 0;
-    background-image: none;
-    -webkit-appearance: none;
-} */
 summary {
     outline: none;
     cursor: pointer;
@@ -73,35 +61,18 @@ summary {
     padding: 0;
     margin-top: 1rem;
     display: flex;
-    /* flex-wrap: wrap; */
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.55rem;
 }
 
 .closeBtn {
-    border: var(--regular-border);
-    font-size: 1rem;
-    cursor: pointer;
+    position: relative;
     width: 32px;
     height: 32px;
-    position: relative;
+    border: var(--regular-border);
     border-radius: 50%;
-}
-
-.login-form {
-    text-align: center;
-}
-
-.login-form h1 {
-    margin-bottom: 1rem;
-    font-weight: 300;
-    color: var(--text-color);
-}
-
-
-h2 {
-    margin-bottom: 1.5rem;
-    color: var(--text-color);
+    font-size: 1rem;
+    cursor: pointer;
 }
 
 .form-group {
@@ -117,81 +88,14 @@ h2 {
 
 }
 
-.form-group input {
-    width: 100%;
-    padding: 0.8rem;
-    border: var(--regular-border);
-    border-radius: 16px;
-    font-size: 1rem;
-    transition: border 0.3s;
-}
-
-.form-group input:focus {
-    border-color: var(--btn-color);
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.25);
-}
-
-.form-category {
-    border: var(--regular-border);
-    border-radius: var(--border-radius, 32px);
-    padding: 1rem;
-    margin-bottom: 1.5rem;
-}
-
-.form-category legend {
-    font-weight: 600;
-    padding: 0 0.5rem;
-    color: var(--border-color);
-    font-size: 1.2rem;
-
-}
-
-.btn-login {
-    display: inline-block;
-    background: var(--btn-color);
-    color: #fff;
-    padding: 0.8rem 1.5rem;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1rem;
-    width: 100%;
-    margin-top: 1rem;
-    transition: background 0.3s;
-}
-
-.btn-login:hover {
-    background: var(--dark-color);
-}
-
-.error-message {
-    background-color: #ffebee;
-    color: var(--danger-color);
-    padding: 0.8rem;
-    border-radius: 4px;
-    margin-bottom: 1rem;
-}
-
-.success-message {
-    background-color: #e8f5e9;
-    color: var(--success-color);
-    padding: 0.8rem;
-    border-radius: 4px;
-    margin-bottom: 1rem;
-}
-
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    color: #333;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100dvh;
-    margin: 0;
+    min-height: 100vh;
+    color: var(--text-color);
+    background:
+        radial-gradient(ellipse at 12% 0%, rgba(202, 54, 111, 0.08), transparent 34rem),
+        var(--background-color);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    line-height: 1.55;
 }
 
 .back-to-top {
@@ -229,115 +133,9 @@ body {
     display: none;
 }
 
-.container {
-    text-align: center;
-    background: var(--background-color);
-    /* Leicht transparenter Hintergrund */
-    border-radius: 50px;
-    border: var(--regular-border);
-    border-width: 2px !important;
-    padding: 2rem;
-    width: 70%;
-    margin: 2rem;
-    min-height: 100vh;
-}
-
-h1 {
-    color: var(--border-color);
-    margin-bottom: 1rem;
-}
-
 p {
     margin-bottom: 1.5rem;
     color: var(--text-color);
-}
-
-.api-status {
-    display: inline-block;
-    padding: 0.5rem 1rem;
-    background-color: #e8f5e9;
-    color: #4caf50;
-    border-radius: 4px;
-    font-weight: 500;
-}
-
-/* Button Styles */
-.btn {
-    display: inline-block;
-    padding: 0.8rem 1.5rem;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1rem;
-    text-decoration: none;
-    text-align: center;
-    transition: background 0.3s, transform 0.2s;
-
-}
-
-.btn:hover {
-    transform: translateY(-1px);
-}
-
-.btn-primary {
-    background: var(--btn-color);
-    color: #fff;
-}
-
-.btn-primary:hover {
-    background: var(--dark-color);
-}
-
-.btn-secondary {
-    background: #6c757d;
-    color: #fff;
-}
-
-.btn-secondary:hover {
-    background: #545b62;
-}
-
-.btn-danger {
-    background: var(--danger-color);
-    color: #fff;
-}
-
-.btn-danger:hover {
-    background: #d32f2f;
-}
-
-/* Select Styles */
-select {
-    width: 100%;
-    padding: 0.8rem;
-    border: var(--regular-border);
-    border-radius: 16px;
-    font-size: 1rem;
-    background-color: #fff;
-    cursor: pointer;
-    transition: border 0.3s;
-}
-
-select:focus {
-    border-color: var(--btn-color);
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.25);
-}
-
-/* Number Input Styles */
-input[type="number"] {
-    width: 100%;
-    padding: 0.8rem;
-    border: var(--regular-border);
-    border-radius: 16px;
-    font-size: 1rem;
-    transition: border 0.3s;
-}
-
-input[type="number"]:focus {
-    /* border-color: var(--btn-color); */
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.595);
 }
 
 /* Checkbox/Toggle Styles */
@@ -361,60 +159,8 @@ input[type="number"]:focus {
     margin: 0;
 }
 
-/* Form Section Styles */
-.form-section {
-    background: rgba(255, 255, 255, 0.05);
-    /* border: var(--regular-border); */
-    border-radius: 32px;
-    padding: 1.2rem;
-    margin-bottom: 1.5rem;
-}
-
-.form-section h3 {
-    color: var(--border-color);
-    margin-bottom: 1rem;
-    font-size: 1.1rem;
-    padding-bottom: 0.5rem;
-    padding: 1rem;
-    border: var(--regular-border);
-    border-bottom: var(--bottom-border) !important;
-    border-radius: 16px;
-}
-
-.form-row {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-.form-row .form-group {
-    flex: 1;
-    margin-bottom: 0;
-}
-
-/* Flash Messages */
-.flash-message {
-    padding: 1rem;
-    border-radius: 4px;
-    margin-bottom: 1.5rem;
-    text-align: center;
-    animation: slideIn 0.3s ease-out;
-}
-
 .flash-message.fade-out {
     animation: fadeOut 0.5s ease-out forwards;
-}
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
 }
 
 @keyframes fadeOut {
@@ -428,55 +174,6 @@ input[type="number"]:focus {
         padding: 0;
         margin: 0;
     }
-}
-
-.flash-success {
-    background-color: rgba(76, 175, 80, 0.2);
-    color: var(--success-color);
-    border: 1px solid var(--success-color);
-}
-
-.flash-error {
-    background-color: rgba(244, 67, 54, 0.2);
-    color: var(--danger-color);
-    border: 1px solid var(--danger-color);
-}
-
-/* Config Form Container */
-.config-form-container {
-    max-width: 100%;
-}
-
-.config-form-container .form-group input,
-.config-form-container .form-group select {
-    background-color: rgba(255, 255, 255, 0.9);
-}
-
-/* Button Group */
-.button-group {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1.5rem;
-}
-
-.button-group .btn {
-    flex: 1;
-}
-
-/* Field Status (für PLZ-Lookup etc.) */
-.field-status {
-    display: block;
-    font-size: 0.85rem;
-    margin-top: 0.3rem;
-    min-height: 1.2em;
-}
-
-.field-status-success {
-    color: var(--success-color);
-}
-
-.field-status-error {
-    color: var(--danger-color);
 }
 
 /* Readonly Inputs */
@@ -560,130 +257,12 @@ input[readonly] {
 @media (max-width: 640px) {
 
     body {
-        align-items: flex-start;
         min-height: 100dvh;
     }
 
-    .container {
-        width: 100%;
-        margin: 0;
-        border-radius: 0;
-        border-left: none;
-        border-right: none;
-        border-top: none;
-        padding: 1.2rem 1rem 2rem;
-        min-height: 100dvh;
-    }
-
-    h1 {
-        font-size: 1.4rem;
-    }
-
-    h2 {
-        font-size: 1.2rem;
-    }
-
-    .form-row {
-        flex-direction: column;
-        gap: 0;
-    }
-
-    .form-row .form-group {
-        margin-bottom: 1.2rem;
-    }
-
-    .button-group {
-        flex-direction: column;
-    }
-
-    .button-group .btn {
-        width: 100%;
-    }
-
-    .form-section {
-        padding: 0.8rem;
-        border-radius: 16px;
-    }
-
-    .form-section h3 {
-        font-size: 1rem;
-        padding: 0.7rem;
-    }
-
-    .form-category {
-        border-radius: 16px;
-        padding: 0.8rem;
-    }
-
-    /* Tooltip auf kleinen Bildschirmen nach links ausrichten */
     .tooltip-text {
         right: auto;
         left: 0;
         width: min(220px, 80vw);
     }
-
-    /* Stop-Tags responsiv */
-    .stopTags {
-        flex-direction: column;
-    }
-
-    /* SVG Logo verkleinern */
-    .container>div>svg:first-child {
-        width: 90% !important;
-    }
-}
-
-/* --- Tabs --- */
-.tabbed>input[type="radio"] {
-    display: none;
-}
-
-.tabbed .nav {
-    display: flex;
-    gap: 0.25rem;
-    justify-content: space-evenly;
-}
-
-.tabbed .nav label {
-    padding: 0.5rem 1rem;
-    cursor: pointer;
-    border: 1px solid transparent;
-    border-radius: 16px;
-    transition: border-color 150ms ease, background-color 150ms ease, color 150ms ease;
-    font-size: larger;
-    min-width: 40%;
-
-}
-
-menu {
-    margin: 10px;
-}
-
-.tabbed menu {
-    list-style: none;
-    padding: 1rem;
-}
-
-/* Standardmäßig alle Tab-Inhalte ausblenden */
-.tabbed menu>li {
-    display: none;
-}
-
-/* Aktiven Reiter hervorheben */
-#tab1:checked~.nav label[for="tab1"],
-#tab2:checked~.nav label[for="tab2"],
-#tab3:checked~.nav label[for="tab3"],
-#tab4:checked~.nav label[for="tab4"] {
-    border: var(--regular-border);
-    border-bottom: var(--bottom-border-sm) !important;
-    border-radius: 16px;
-
-}
-
-/* Passenden Inhalt zum aktiven Reiter einblenden */
-#tab1:checked~menu>li.tab1,
-#tab2:checked~menu>li.tab2,
-#tab3:checked~menu>li.tab3,
-#tab4:checked~menu>li.tab4 {
-    display: block;
 }
