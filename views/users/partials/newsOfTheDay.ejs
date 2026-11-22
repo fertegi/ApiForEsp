@@ -20,57 +20,57 @@
 %>
 
 <section class="feed feed--list" aria-label="Nachrichten">
-    <header class="feed-header">
-        <h3>News des Tages für <%= user.username %></h3>
-        <% if (newsItems.length > 0) { %>
-        <span class="feed-total"><%= newsItems.length %> Nachrichten</span>
-        <% } %>
-    </header>
-
-    <% if (newsKeywords.length > 0) { %>
-    <div class="feed-keywords" aria-label="Konfigurierte Nachrichtensuchbegriffe">
-        <span class="feed-keywords-label">Suchbegriffe:</span>
-        <ul class="chip-list">
-            <% newsKeywords.forEach((keyword) => { %>
-            <li class="chip"><%= keyword %></li>
-            <% }); %>
-        </ul>
-    </div>
+  <header class="feed-header">
+    <h3>News des Tages für <%= user.username %></h3>
+    <% if (newsItems.length > 0) { %>
+    <span class="feed-total"><%= newsItems.length %> Nachrichten</span>
     <% } %>
+  </header>
 
-    <% if (newsItems.length === 0) { %>
-    <p class="feed-empty">Aktuell wurden keine Nachrichten gefunden.</p>
-    <% } else { %>
-    <ul class="card-grid">
-        <% newsItems.forEach((item, index) => { const hasSafeUrl = isSafeUrl(item.link); %>
-        <li class="card" style="--i: <%= index %>">
-            <% if (hasSafeUrl) { %>
-            <a class="card-link" href="<%= item.link %>" target="_blank" rel="noopener noreferrer">
-            <% } else { %>
-            <div class="card-link">
-            <% } %>
-                <span class="card-body">
-                    <span class="card-title accent"><%= item.title %></span>
-                    <% if (item.description) { %>
-                    <span class="card-text"><%= item.description %></span>
-                    <% } %>
-                    <span class="card-meta">
-                        <% if (item.pubDate) { %>
-                        <time class="card-subtext"><%= formatNewsDate(item.pubDate) %></time>
-                        <% } %>
-                        <% if (item.creator) { %>
-                        <span class="card-subtext"><%= item.creator %></span>
-                        <% } %>
-                    </span>
-                </span>
-            <% if (hasSafeUrl) { %>
-            </a>
-            <% } else { %>
-            </div>
-            <% } %>
-        </li>
-        <% }); %>
+  <% if (newsKeywords.length > 0) { %>
+  <div class="feed-keywords" aria-label="Konfigurierte Nachrichtensuchbegriffe">
+    <span class="feed-keywords-label">Suchbegriffe:</span>
+    <ul class="chip-list">
+      <% newsKeywords.forEach((keyword) => { %>
+      <li class="chip"><%= keyword %></li>
+      <% }); %>
     </ul>
-    <% } %>
+  </div>
+  <% } %>
+
+  <% if (newsItems.length === 0) { %>
+  <p class="feed-empty">Aktuell wurden keine Nachrichten gefunden.</p>
+  <% } else { %>
+  <ul class="card-grid">
+    <% newsItems.forEach((item, index) => { const hasSafeUrl = isSafeUrl(item.link); %>
+    <li class="card" style="--i: <%= index %>">
+      <% if (hasSafeUrl) { %>
+      <a class="card-link" href="<%= item.link %>" target="_blank" rel="noopener noreferrer">
+        <% } else { %>
+        <div class="card-link">
+          <% } %>
+          <span class="card-body">
+            <span class="card-title accent"><%= item.creator %> | <%= item.title %></span>
+            <% if (item.description) { %>
+            <span class="card-text"><%= item.description %></span>
+            <% } %>
+            <span class="card-meta">
+              <% if (item.pubDate) { %>
+              <time class="card-subtext"><%= formatNewsDate(item.pubDate) %></time>
+              <% } %>
+              <% if (item.creator) { %>
+              <span class="card-subtext"><%= item.creator %></span>
+              <% } %>
+            </span>
+          </span>
+          <% if (hasSafeUrl) { %>
+      </a>
+      <% } else { %>
+      </div>
+      <% } %>
+    </li>
+    <% }); %>
+  </ul>
+  <% } %>
 </section>
 <script src="/js/offers.js" defer></script>
