@@ -1,4 +1,7 @@
 <%
+    const offerKeywords = Array.isArray(configurations?.[0]?.config?.offers?.searchKeywords)
+        ? configurations[0].config.offers.searchKeywords.filter((keyword) => typeof keyword === 'string' && keyword.trim())
+        : [];
     const offerGroups = Object.entries((offers && typeof offers === 'object') ? offers : {})
         .filter(([, list]) => Array.isArray(list) && list.length > 0)
         .sort(([a], [b]) => a.localeCompare(b, 'de'));
@@ -17,6 +20,17 @@
         <span class="offers-total"><%= totalOffers %> Angebote bei <%= offerGroups.length %> Händlern</span>
         <% } %>
     </header>
+
+    <% if (offerKeywords.length > 0) { %>
+    <div class="offer-config" aria-label="Konfigurierte Angebotssuchbegriffe">
+        <span class="offer-config-label">Suchbegriffe:</span>
+        <ul class="offer-config-list">
+            <% offerKeywords.forEach((keyword) => { %>
+            <li class="offer-config-keyword"><%= keyword %></li>
+            <% }); %>
+        </ul>
+    </div>
+    <% } %>
 
     <% if (offerGroups.length === 0) { %>
     <p class="offers-empty">Aktuell keine Angebote gefunden. Prüfe deine Suchbegriffe und Händler in der Konfiguration.

@@ -3,6 +3,7 @@ import { invalidateDeviceCache } from "../configLoader.js";
 import { getCoordinatesForZipCode } from "../services/zipCodeService.js";
 import { deviceConfigSchema } from "../deviceConfigSchema.js";
 import { getOffersFromConfig } from "../services/marktguru.js";
+import { getNewsOfTheDay } from "../services/newsOfTheDay.js";
 
 const TimeUtils = {
     MS_PER_SECOND: 1000,
@@ -185,15 +186,15 @@ export function setupUserRoutes(app) {
 
         const configurations = await getUserConfigurations(user);
 
-        // const offers = await getItemsToRender(configurations[0]);
         const { config } = configurations[0]
         const offers = await getOffersFromConfig(config)
+        const newsOfTheDay = await getNewsOfTheDay(config.newsOfTheDay || {})
         res.render("users/profile", {
             user: user,
             status: "Top",
             configurations,
-            offers
+            offers,
+            newsOfTheDay
         });
     });
-
 }

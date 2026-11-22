@@ -1,2 +1,71 @@
-<link rel="stylesheet" href="/css/apps.css">
-<h1>News <%= user.username %></h1>
+<%
+    const newsItems = Array.isArray(newsOfTheDay) ? newsOfTheDay : [];
+    const newsKeywords = Array.isArray(configurations?.[0]?.config?.newsOfTheDay?.keywords)
+        ? configurations[0].config.newsOfTheDay.keywords.filter((keyword) => typeof keyword === 'string' && keyword.trim())
+        : [];
+    const isSafeUrl = (value) => {
+        try {
+            const url = new URL(value);
+            return url.protocol === 'http:' || url.protocol === 'https:';
+        } catch {
+            return false;
+        }
+    };
+    const formatNewsDate = (value) => {
+        const date = new Date(value);
+        return Number.isNaN(date.getTime())
+            ? value
+            : date.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    };
+%>
+
+<section class="offers news" aria-label="Nachrichten">
+    <header class="offers-header">
+        <h3>News des Tages für <%= user.username %></h3>
+        <% if (newsItems.length > 0) { %>
+        <span class="offers-total"><%= newsItems.length %> Nachrichten</span>
+        <% } %>
+    </header>
+
+    <% if (newsKeywords.length > 0) { %>
+    <div class="offer-config" aria-label="Konfigurierte Nachrichtensuchbegriffe">
+        <span class="offer-config-label">Suchbegriffe:</span>
+        <ul class="offer-config-list">
+            <% newsKeywords.forEach((keyword) => { %>
+            <li class="offer-config-keyword"><%= keyword %></li>
+            <% }); %>
+        </ul>
+    </div>
+    <% } %>
+
+    <% if (newsItems.length === 0) { %>
+    <p class="offers-empty">Aktuell wurden keine Nachrichten gefunden.</p>
+    <% } else { %>
+    <ul class="offer-grid">
+        <% newsItems.forEach((item, index) => { const hasSafeUrl = isSafeUrl(item.link); %>
+        <li class="offer-card" style="--i: <%= index %>">
+            <% if (hasSafeUrl) { %>
+            <a class="offer-link news-link" href="<%= item.link %>" target="_blank" rel="noopener noreferrer">
+            <% } else { %>
+            <div class="offer-link news-link">
+            <% } %>
+                <span class="offer-body">
+                    <span class="offer-name"><%= item.title %></span>
+                    <% if (item.creator) { %>
+                    <span class="news-publisher"><%= item.creator %></span>
+                    <% } %>
+                    <% if (item.pubDate) { %>
+                    <time class="news-date"><%= formatNewsDate(item.pubDate) %></time>
+                    <% } %>
+                </span>
+            <% if (hasSafeUrl) { %>
+            </a>
+            <% } else { %>
+            </div>
+            <% } %>
+        </li>
+        <% }); %>
+    </ul>
+    <% } %>
+</section>
+<script src="/js/offers.js" defer></script>
