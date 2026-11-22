@@ -7,29 +7,32 @@
     <title>smarta</title>
     <%- include('../partials/head-pwa') %>
     <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/pages.css">
     <link rel="stylesheet" href="/css/apps.css">
 </head>
 <script src="/js/pwa.js" defer></script>
 
 <body>
-    <main class="container profile-page">
-        <header class="profile-header">
-            <h1>Hello <%= user.username %>!</h1>
-            <p>Willkommen beim ESP32 Your Watcher Manager.</p>
-            <p>Hier hast du die Möglichkeit, deinen YourWatcher einzustellen.</p>
+    <main class="page-shell profile-page">
+        <header class="page-heading app-page-header profile-header">
+            <div class="page-heading-copy">
+                <h1>Hallo <%= user.username %>!</h1>
+                <p>Willkommen bei deinem smarta-Manager.</p>
+                <p>Hier hast du die Möglichkeit, deinen smarta einzustellen.</p>
+            </div>
         </header>
         <div class="profile-actions">
             <a href="/user/setDeviceConfiguration" class="btn btn-primary">Geräte-Einstellungen</a>
             <a href="/user/logout" class="btn btn-secondary">Abmelden</a>
         </div>
 
-        <div class="tabbed profile-tabs">
+        <div class="profile-tabs">
             <input checked="checked" id="tab1" type="radio" name="tabs">
             <input id="tab2" type="radio" name="tabs">
 
-            <div class="nav profile-nav">
-                <label for="tab1">📣 Angebote App</label>
-                <label for="tab2">📰 Nachrichten App</label>
+            <div class="nav">
+                <label for="tab1">Angebote App</label>
+                <label for="tab2">Nachrichten App</label>
             </div>
 
             <menu>

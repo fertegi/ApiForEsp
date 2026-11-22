@@ -4,44 +4,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Smarta</title>
+    <title>Login - smarta</title>
     <%- include('../partials/head-pwa') %>
     <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/pages.css">
 </head>
 <script src="/js/pwa.js" defer></script>
 
 <body>
-    <div class="container">
-        <div class="login-form">
-            <h2>Anmelden</h2>
+    <main class="page-shell login-page">
+        <section class="login-card page-card">
+            <div class="login-brand-mark" aria-hidden="true">smarta</div>
+            <h1>Anmelden</h1>
+            <p class="login-intro">Melde dich an, um deinen smarta zu verwalten.</p>
 
             <% if (locals.error) { %>
-                <div class="error-message">
-                    <%= error %>
+            <div class="error-message" role="alert">
+                <%= error %>
+            </div>
+            <% } %>
+
+            <% if (locals.success) { %>
+            <div class="success-message" role="status">
+                <%= success %>
+            </div>
+            <% } %>
+
+            <form action="/user/login" method="POST">
+                <div class="form-group">
+                    <label for="username">Benutzername</label>
+                    <input type="text" id="username" name="username" required autofocus>
                 </div>
-                <% } %>
 
-                    <% if (locals.success) { %>
-                        <div class="success-message">
-                            <%= success %>
-                        </div>
-                        <% } %>
+                <div class="form-group">
+                    <label for="password">Passwort</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
 
-                            <form action="/user/login" method="POST">
-                                <div class="form-group">
-                                    <label for="username">Benutzername</label>
-                                    <input type="text" id="username" name="username" required autofocus>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="password">Passwort</label>
-                                    <input type="password" id="password" name="password" required>
-                                </div>
-
-                                <button type="submit" class="btn-login">Anmelden</button>
-                            </form>
-        </div>
-    </div>
+                <button type="submit" class="btn btn-primary login-submit">Anmelden</button>
+            </form>
+        </section>
+    </main>
 </body>
 
 </html>
