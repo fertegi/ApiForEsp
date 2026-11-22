@@ -2,7 +2,7 @@
     // This file is also imported by the server, where there is no DOM.
     if (typeof document === 'undefined') return;
 
-    const cards = document.querySelectorAll('.offer-card');
+    const cards = document.querySelectorAll('.card');
     if (!cards.length) return;
 
     const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -22,10 +22,10 @@
     cards.forEach((card) => observer.observe(card));
 
     // Cards inside a collapsed <details> have no layout; re-check once the group is opened.
-    document.querySelectorAll('.offer-group').forEach((group) => {
+    document.querySelectorAll('.feed-group').forEach((group) => {
         group.addEventListener('toggle', () => {
             if (!group.open) return;
-            group.querySelectorAll('.offer-card:not(.is-visible)').forEach((card) => observer.observe(card));
+            group.querySelectorAll('.card:not(.is-visible)').forEach((card) => observer.observe(card));
         });
     });
 })();

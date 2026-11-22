@@ -19,47 +19,47 @@
     };
 %>
 
-<section class="offers news" aria-label="Nachrichten">
-    <header class="offers-header">
+<section class="feed feed--list" aria-label="Nachrichten">
+    <header class="feed-header">
         <h3>News des Tages für <%= user.username %></h3>
         <% if (newsItems.length > 0) { %>
-        <span class="offers-total"><%= newsItems.length %> Nachrichten</span>
+        <span class="feed-total"><%= newsItems.length %> Nachrichten</span>
         <% } %>
     </header>
 
     <% if (newsKeywords.length > 0) { %>
-    <div class="offer-config" aria-label="Konfigurierte Nachrichtensuchbegriffe">
-        <span class="offer-config-label">Suchbegriffe:</span>
-        <ul class="offer-config-list">
+    <div class="feed-keywords" aria-label="Konfigurierte Nachrichtensuchbegriffe">
+        <span class="feed-keywords-label">Suchbegriffe:</span>
+        <ul class="chip-list">
             <% newsKeywords.forEach((keyword) => { %>
-            <li class="offer-config-keyword"><%= keyword %></li>
+            <li class="chip"><%= keyword %></li>
             <% }); %>
         </ul>
     </div>
     <% } %>
 
     <% if (newsItems.length === 0) { %>
-    <p class="offers-empty">Aktuell wurden keine Nachrichten gefunden.</p>
+    <p class="feed-empty">Aktuell wurden keine Nachrichten gefunden.</p>
     <% } else { %>
-    <ul class="offer-grid">
+    <ul class="card-grid">
         <% newsItems.forEach((item, index) => { const hasSafeUrl = isSafeUrl(item.link); %>
-        <li class="offer-card" style="--i: <%= index %>">
+        <li class="card" style="--i: <%= index %>">
             <% if (hasSafeUrl) { %>
-            <a class="offer-link news-link" href="<%= item.link %>" target="_blank" rel="noopener noreferrer">
+            <a class="card-link" href="<%= item.link %>" target="_blank" rel="noopener noreferrer">
             <% } else { %>
-            <div class="offer-link news-link">
+            <div class="card-link">
             <% } %>
-                <span class="offer-body">
-                    <span class="offer-name offer-price"><%= item.title %></span>
+                <span class="card-body">
+                    <span class="card-title accent"><%= item.title %></span>
                     <% if (item.description) { %>
-                    <span class="news-description"><%= item.description %></span>
+                    <span class="card-text"><%= item.description %></span>
                     <% } %>
-                    <span class="news-meta">
+                    <span class="card-meta">
                         <% if (item.pubDate) { %>
-                        <time class="news-date"><%= formatNewsDate(item.pubDate) %></time>
+                        <time class="card-subtext"><%= formatNewsDate(item.pubDate) %></time>
                         <% } %>
                         <% if (item.creator) { %>
-                        <span class="news-publisher"><%= item.creator %></span>
+                        <span class="card-subtext"><%= item.creator %></span>
                         <% } %>
                     </span>
                 </span>

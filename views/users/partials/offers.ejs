@@ -13,60 +13,60 @@
             : '';
     };
 %>
-<section class="offers" aria-label="Angebote">
-    <header class="offers-header">
+<section class="feed" aria-label="Angebote">
+    <header class="feed-header">
         <h3>Angebote</h3>
         <% if (totalOffers > 0) { %>
-        <span class="offers-total"><%= totalOffers %> Angebote bei <%= offerGroups.length %> Händlern</span>
+        <span class="feed-total"><%= totalOffers %> Angebote bei <%= offerGroups.length %> Händlern</span>
         <% } %>
     </header>
 
     <% if (offerKeywords.length > 0) { %>
-    <div class="offer-config" aria-label="Konfigurierte Angebotssuchbegriffe">
-        <span class="offer-config-label">Suchbegriffe:</span>
-        <ul class="offer-config-list">
+    <div class="feed-keywords" aria-label="Konfigurierte Angebotssuchbegriffe">
+        <span class="feed-keywords-label">Suchbegriffe:</span>
+        <ul class="chip-list">
             <% offerKeywords.forEach((keyword) => { %>
-            <li class="offer-config-keyword"><%= keyword %></li>
+            <li class="chip"><%= keyword %></li>
             <% }); %>
         </ul>
     </div>
     <% } %>
 
     <% if (offerGroups.length === 0) { %>
-    <p class="offers-empty">Aktuell keine Angebote gefunden. Prüfe deine Suchbegriffe und Händler in der Konfiguration.
+    <p class="feed-empty">Aktuell keine Angebote gefunden. Prüfe deine Suchbegriffe und Händler in der Konfiguration.
     </p>
     <% } %>
 
     <% offerGroups.forEach(([retailer, list], groupIndex) => { %>
-    <details class="offer-group" >
-        <summary class="offer-group-summary">
-            <span class="offer-retailer">
-                <span class="offer-retailer-initial" aria-hidden="true"><%= retailer.charAt(0).toUpperCase() %></span>
-                <span class="offer-retailer-name"><%= retailer %></span>
+    <details class="feed-group" >
+        <summary class="feed-group-summary">
+            <span class="feed-group-title">
+                <span class="avatar" aria-hidden="true"><%= retailer.charAt(0).toUpperCase() %></span>
+                <span class="feed-group-name"><%= retailer %></span>
             </span>
-            <span class="offer-count"><%= list.length %></span>
-            <span class="offer-chevron" aria-hidden="true"></span>
+            <span class="chip"><%= list.length %></span>
+            <span class="chevron" aria-hidden="true"></span>
         </summary>
         <search></search>
-        <ul class="offer-grid">
+        <ul class="card-grid">
             <% list.forEach((offer, index) => { %>
-            <li class="offer-card" style="--i: <%= index %>">
-                <a class="offer-link" href="<%= offer.url %>" target="_blank" rel="noopener noreferrer">
+            <li class="card" style="--i: <%= index %>">
+                <a class="card-link" href="<%= offer.url %>" target="_blank" rel="noopener noreferrer">
                     <% if (offer.img_url) { %>
-                    <span class="offer-image">
+                    <span class="card-image">
                         <img src="<%= offer.img_url %>" alt="" width="96" height="96" loading="lazy" decoding="async"
-                            fetchpriority="low" onerror="this.closest('.offer-image').classList.add('is-broken')">
+                            fetchpriority="low" onerror="this.closest('.card-image').classList.add('is-broken')">
                     </span>
                     <% } else { %>
-                    <span class="offer-image is-broken"></span>
+                    <span class="card-image is-broken"></span>
                     <% } %>
-                    <span class="offer-body">
-                        <span class="offer-name"><%= offer.name %></span>
+                    <span class="card-body">
+                        <span class="card-title"><%= offer.name %></span>
                         <% if (offer.keyword) { %>
-                        <span class="offer-keyword"><%= offer.keyword %></span>
+                        <span class="card-subtext"><%= offer.keyword %></span>
                         <% } %>
                         <% const price = formatPrice(offer.price); if (price) { %>
-                        <span class="offer-price"><%= price %></span>
+                        <span class="accent"><%= price %></span>
                         <% } %>
                     </span>
                 </a>
