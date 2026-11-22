@@ -6,6 +6,17 @@ const TTL_NEWS = 3600; // 1 Stunde Cache
 const LANGUAGES = ["de", "en"];
 const PAGE_SIZE = 10;
 
+function removeDuplicateTitles(items) {
+  const seenTitles = new Set();
+  return items.filter((item) => {
+    if (seenTitles.has(item.title)) {
+      return false;
+    }
+    seenTitles.add(item.title);
+    return true;
+  });
+}
+
 async function fetchNewsFromApi(
   keywords = [],
   languages = LANGUAGES,
@@ -41,12 +52,12 @@ async function fetchNewsFromApi(
 }
 
 async function _getNewsOfTheDay(config = {}) {
-  const newsConfig = config?.newsOfTheDay || config;
+  const newsConfig = config.newsOfTheDay;
 
   // Check if user provided a custom RSS feed URL
   if (newsConfig.rssFeedUrl) {
     // Use RSS feed instead of the news API
-    return await fetchRssFeed(newsConfig.rssFeedUrl);
+    return removeDuplicateTitles(await fetchRssFeed(newsConfig.rssFeedUrl));
   }
 
   // Otherwise, use the default news API
@@ -58,7 +69,9 @@ async function _getNewsOfTheDay(config = {}) {
       ? newsConfig.languages
       : LANGUAGES;
   const pageSize = newsConfig.pageSize || PAGE_SIZE;
-  return await fetchNewsFromApi(keywords, languages, pageSize);
+  const data = await fetchNewsFromApi(keywords, languages, pageSize);
+  console.log(removeDuplicateTitles(data));
+  return removeDuplicateTitles(data);
 }
 
 export const getNewsOfTheDay = deviceCached(TTL_NEWS)(_getNewsOfTheDay);
